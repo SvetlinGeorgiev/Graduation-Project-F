@@ -10,19 +10,20 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float jumpForce = 8f;
-    
     private bool isGrounded;
+    public bool canDoubleJump = false;
+    private bool hasDoubleJumpAbility = false; 
+
+    [Header("Flip Settings")]
+    public float flipSpeed = 360f; 
 
     private void Awake()
     {
-        // Initialize input system
         controls = new PlayerControls();
-
-        // Bind movement and jump actions
         controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
         controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Jump.performed += ctx => Jump();
-        
+
         rb = GetComponent<Rigidbody>();
     }
 
@@ -31,7 +32,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Move left and right (only X-axis)
         rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
     }
 
@@ -40,12 +40,19 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded)
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+            isGrounded = false;
+            canDoubleJump = hasDoubleJumpAbility; 
+        }
+        else if (canDoubleJump)
+        {
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+            canDoubleJump = false;
+            StartCoroutine(FlipAnimation());
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Check if we are on the ground
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
@@ -58,5 +65,24 @@ public class PlayerMovement : MonoBehaviour
         {
             isGrounded = false;
         }
+    }
+
+    public void UnlockDoubleJump()
+    {
+        hasDoubleJumpAbility = true;
+        Debug.Log("Double Jump Unlocked!");
+    }
+
+    private System.Collections.IEnumerator FlipAnimation()
+    {
+        float rotation = 0;
+        while (rotation < 360)
+        {
+            float step = flipSpeed * Time.deltaTime;
+            transform.Rotate(Vector3.forward, step);
+            rotation += step;
+            yield return null;
+        }
+        transform.rotation = Quaternion.identity; 
     }
 }
