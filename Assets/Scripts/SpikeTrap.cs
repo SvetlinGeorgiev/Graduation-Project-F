@@ -3,11 +3,11 @@ using System.Collections;
 
 public class SpikeTrap : MonoBehaviour
 {
-    public float upPosition = 1f; // The height when the spikes are up
-    public float downPosition = 0f; // The height when the spikes are hidden
-    public float riseSpeed = 2f; // How fast the spikes rise
-    public float delayBeforeRetract = 1f; // How long they stay up
-    public float delayBeforeRise = 2f; // Time before they rise again
+    public float upPosition = 1f; 
+    public float downPosition = 0f; 
+    public float riseSpeed = 2f; 
+    public float delayBeforeRetract = 1f; 
+    public float delayBeforeRise = 2f; 
 
     private Vector3 startPos;
     private Vector3 endPos;
@@ -17,7 +17,7 @@ public class SpikeTrap : MonoBehaviour
     {
         startPos = new Vector3(transform.position.x, downPosition, transform.position.z);
         endPos = new Vector3(transform.position.x, upPosition, transform.position.z);
-        transform.position = startPos; // Start hidden
+        transform.position = startPos; 
         StartCoroutine(SpikeCycle());
     }
 
@@ -26,11 +26,11 @@ public class SpikeTrap : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(delayBeforeRise);
-            StartCoroutine(MoveSpikes(endPos)); // Move up
+            StartCoroutine(MoveSpikes(endPos)); 
             isUp = true;
 
             yield return new WaitForSeconds(delayBeforeRetract);
-            StartCoroutine(MoveSpikes(startPos)); // Move down
+            StartCoroutine(MoveSpikes(startPos)); 
             isUp = false;
         }
     }
@@ -58,7 +58,7 @@ public class SpikeTrap : MonoBehaviour
             other.GetComponent<PlayerMovement>()?.TakeDamage(transform.position);
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(25); // Spikes deal 25 damage
+                playerHealth.TakeDamage(25); 
             }
         }
     }

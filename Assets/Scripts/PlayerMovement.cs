@@ -105,9 +105,9 @@ public class PlayerMovement : MonoBehaviour
         isKnockedBack = true;
 
         Vector3 knockbackDirection = (transform.position - damageSource).normalized;
-        knockbackDirection.y = 0.5f; // Add slight vertical push
+        knockbackDirection.y = 0.5f; 
 
-        rb.linearVelocity = Vector3.zero; // Reset velocity before applying knockback
+        rb.linearVelocity = Vector3.zero; 
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
 
         yield return new WaitForSeconds(knockbackDuration);
