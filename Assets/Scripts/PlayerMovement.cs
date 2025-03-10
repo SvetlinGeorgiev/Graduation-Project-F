@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -12,10 +13,15 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 8f;
     private bool isGrounded;
     public bool canDoubleJump = false;
-    private bool hasDoubleJumpAbility = false; 
+    private bool hasDoubleJumpAbility = false;
 
     [Header("Flip Settings")]
-    public float flipSpeed = 360f; 
+    public float flipSpeed = 360f;
+
+    [Header("Knockback Settings")]
+    public float knockbackForce = 10f;
+    public float knockbackDuration = 0.2f;
+    private bool isKnockedBack = false;
 
     private void Awake()
     {
@@ -32,7 +38,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
+        if (!isKnockedBack)
+        {
+            rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
+        }
     }
 
     private void Jump()
@@ -41,7 +50,7 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             isGrounded = false;
-            canDoubleJump = hasDoubleJumpAbility; 
+            canDoubleJump = hasDoubleJumpAbility;
         }
         else if (canDoubleJump)
         {
@@ -73,7 +82,7 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("Double Jump Unlocked!");
     }
 
-    private System.Collections.IEnumerator FlipAnimation()
+    private IEnumerator FlipAnimation()
     {
         float rotation = 0;
         while (rotation < 360)
@@ -83,6 +92,26 @@ public class PlayerMovement : MonoBehaviour
             rotation += step;
             yield return null;
         }
-        transform.rotation = Quaternion.identity; 
+        transform.rotation = Quaternion.identity;
+    }
+
+    public void TakeDamage(Vector3 damageSource)
+    {
+        StartCoroutine(Knockback(damageSource));
+    }
+
+    private IEnumerator Knockback(Vector3 damageSource)
+    {
+        isKnockedBack = true;
+
+        Vector3 knockbackDirection = (transform.position - damageSource).normalized;
+        knockbackDirection.y = 0.5f; // Add slight vertical push
+
+        rb.linearVelocity = Vector3.zero; // Reset velocity before applying knockback
+        rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+
+        yield return new WaitForSeconds(knockbackDuration);
+
+        isKnockedBack = false;
     }
 }
