@@ -6,8 +6,12 @@ public class EnemyAI : MonoBehaviour
     public float moveSpeed = 3f;
     public float jumpForce = 8f;
     public float detectionRange = 7f;
-    public float patrolTime = 2f; // Time before switching state
-    public Transform groundCheck; // Empty GameObject at enemy's feet
+    public float patrolTime = 2f;
+
+    public Transform edgeCheck, edgeCheckLeft; 
+    public Transform upperPlatformCheck, upperPlatformCheckLeft;
+    public Transform lowerPlatformCheck, lowerPlatformCheckLeft;
+    public Transform groundCheck;
     public LayerMask groundLayer;
 
     private Rigidbody rb;
@@ -26,7 +30,6 @@ public class EnemyAI : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Check if the enemy is on the ground
         isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundLayer);
 
         if (isChasing)
@@ -37,6 +40,8 @@ public class EnemyAI : MonoBehaviour
         {
             Patrol();
         }
+        
+        CheckForPlatformsAndEdges();
     }
 
     private IEnumerator RandomBehavior()
@@ -44,7 +49,7 @@ public class EnemyAI : MonoBehaviour
         while (true)
         {
             float waitTime = Random.Range(1f, patrolTime);
-            isIdle = Random.value > 0.5f; // 50% chance to idle
+            isIdle = Random.value > 0.5f; 
 
             if (isIdle)
             {
@@ -61,7 +66,6 @@ public class EnemyAI : MonoBehaviour
 
     private void Patrol()
     {
-        // Move left or right
         rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
     }
 
@@ -71,18 +75,79 @@ public class EnemyAI : MonoBehaviour
 
         Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
 
-        // Lock movement to left/right axis only
         movementDirection = new Vector3(Mathf.Sign(directionToPlayer.x), 0, 0);
 
-        // Move towards the player
         rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+    }
 
-        // Check if jump is needed
-        if (isGrounded && player.transform.position.y > transform.position.y + 1f)
+    private void CheckForPlatformsAndEdges()
+    {
+        bool movingRight = movementDirection.x > 0;
+
+        Transform edgeCheckPos = movingRight ? edgeCheck : edgeCheckLeft;
+        Transform upperCheckPos = movingRight ? upperPlatformCheck : upperPlatformCheckLeft;
+        Transform lowerCheckPos = movingRight ? lowerPlatformCheck : lowerPlatformCheckLeft;
+
+        bool edgeDetected = !Physics.Raycast(edgeCheckPos.position, Vector3.down, 1f, groundLayer);
+
+        RaycastHit upperHit;
+        Vector3 rayDirection = (upperCheckPos.position - edgeCheckPos.position).normalized; 
+        float rayDistance = Vector3.Distance(edgeCheckPos.position, upperCheckPos.position); 
+        bool upperPlatformDetected = Physics.Raycast(
+            edgeCheckPos.position, 
+            rayDirection, 
+            out upperHit,
+            rayDistance, 
+            groundLayer
+        );
+
+        RaycastHit lowerHit;
+        bool lowerPlatformDetected = Physics.Raycast(
+            lowerCheckPos.position, 
+            movementDirection, 
+            out lowerHit, 
+            1.5f, 
+            groundLayer
+        );
+
+        RaycastHit headHit;
+        bool headBlocked = Physics.Raycast(
+            transform.position + Vector3.up * 0.5f, 
+            Vector3.up, 
+            out headHit,
+            upperCheckPos.position.y - (transform.position.y + 0.5f), 
+            groundLayer
+        );
+
+        if (upperPlatformDetected && isGrounded && !headBlocked)
+        {
+            float platformY = upperHit.point.y;
+            float enemyY = transform.position.y;
+
+            if (platformY > enemyY + 0.2f) 
+            {
+                Jump();
+            }
+        }
+        else if (edgeDetected && lowerPlatformDetected && isGrounded)
+        {
+            StartCoroutine(DelayedJump());
+        }
+    }
+
+
+
+
+
+    private IEnumerator DelayedJump()
+    {
+        yield return new WaitForSeconds(0.2f); 
+        if (isGrounded) 
         {
             Jump();
         }
     }
+
 
     private void Jump()
     {
@@ -103,7 +168,7 @@ public class EnemyAI : MonoBehaviour
             yield return null;
         }
 
-        transform.rotation = Quaternion.identity; // Reset tilt
+        transform.rotation = Quaternion.identity; 
     }
 
     private void OnTriggerEnter(Collider other)
