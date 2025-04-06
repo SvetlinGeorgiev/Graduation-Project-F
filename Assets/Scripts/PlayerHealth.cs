@@ -13,7 +13,7 @@ public class PlayerHealth : MonoBehaviour
     private void Awake()
     {
         controls = new PlayerControls();
-        //controls.Player.UseItem.performed += ctx => UseHealthPotion();
+        controls.Player.UseItem.performed += ctx => UseItem();
     }
 
     private void Start()
@@ -37,16 +37,20 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    /*public void UseHealthPotion()
-{
-    int healAmount = InventoryManager.Instance.UseHealthPotion(); // Get the healing amount
-
-    if (healAmount > 0) // If healing is received
+    public void RestoreHealth(int amount)
     {
-        currentHealth = Mathf.Min(currentHealth + healAmount, maxHealth); // Prevent overhealing
+        currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
         healthBar.value = currentHealth;
     }
-}*/
+
+    private void UseItem()
+    {
+        InventoryManager inventory = GetComponent<InventoryManager>();
+        if (inventory != null)
+        {
+            inventory.UseItem(0); // Use the first item in inventory for now
+        }
+    }
 
 
     private void Die()
