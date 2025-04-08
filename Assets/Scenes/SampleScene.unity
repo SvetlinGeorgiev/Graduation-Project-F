@@ -1851,7 +1851,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 859731681}
-  - component: {fileID: 859731682}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1874,20 +1873,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 872373319}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &859731682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 859731680}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efcb67daca5fb2444b3519b78b718f32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventory: []
-  inventoryUI: {fileID: 0}
 --- !u!1 &872373318
 GameObject:
   m_ObjectHideFlags: 0
@@ -2017,7 +2002,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 872373318}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efcb67daca5fb2444b3519b78b718f32, type: 3}
+  m_Script: {fileID: 11500000, guid: d60eda0586f187a4db5a629e3b86a9db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   inventory: []
