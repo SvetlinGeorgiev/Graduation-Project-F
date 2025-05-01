@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class PauseMenu : MonoBehaviour
 {
-    public GameObject pauseMenuPanel; // Reference to the pause menu panel
+    public GameObject pauseMenuPanel; 
     private bool isPaused = false;
 
     void Update()
     {
-        // Toggle the pause menu when the "TAB" key is pressed
+        // Toggle the pause menu when tab pressed
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             if (isPaused)
