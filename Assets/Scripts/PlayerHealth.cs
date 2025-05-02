@@ -48,7 +48,7 @@ public class PlayerHealth : MonoBehaviour
         InventoryManager inventory = GetComponent<InventoryManager>();
         if (inventory != null)
         {
-            inventory.UseItem(0); // Use the first item in inventory for now
+            inventory.UseItem(0); 
         }
     }
 
