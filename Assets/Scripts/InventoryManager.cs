@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using System.Collections.Generic;
 
 public class InventoryManager : MonoBehaviour
@@ -40,4 +40,4 @@ public class InventoryManager : MonoBehaviour
     {
         Debug.Log("Inventory: " + string.Join(", ", inventory));
     }
-}
+}*/
