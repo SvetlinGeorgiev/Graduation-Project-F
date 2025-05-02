@@ -1,4 +1,4 @@
-/*using UnityEngine;
+using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
 {
@@ -10,4 +10,4 @@ public class ItemPickup : MonoBehaviour
             Destroy(gameObject); // Remove potion from the scene
         }
     }
-}*/
+}

@@ -7,20 +7,13 @@ public class PlayerMovement : MonoBehaviour
     private PlayerControls controls;
     private Rigidbody rb;
     private Vector2 moveInput;
-
+    
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float jumpForce = 8f;
     private bool isGrounded;
     public bool canDoubleJump = false;
     private bool hasDoubleJumpAbility = false;
-
-    [Header("Attack Hitbox Settings")]
-    public Vector3 attackBoxSize = new Vector3(1f, 1f, 1f);
-    public Vector3 attackBoxOffset = new Vector3(1f, 0f, 0f);
-    public LayerMask enemyLayer;
-    public float attackDamage = 25f;
-
 
     [Header("Flip Settings")]
     public float flipSpeed = 360f;
@@ -30,24 +23,14 @@ public class PlayerMovement : MonoBehaviour
     public float knockbackDuration = 0.2f;
     private bool isKnockedBack = false;
 
-    [Header("Attack Settings")]
-    public float comboResetTime = 1.0f;
-    private int comboStep = 0;
-    private bool isAttacking = false;
-    private Coroutine comboResetCoroutine;
-
-    private Quaternion originalRotation;
-
     private void Awake()
     {
         controls = new PlayerControls();
-        rb = GetComponent<Rigidbody>();
-        originalRotation = transform.rotation;
-
         controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
         controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Jump.performed += ctx => Jump();
-        controls.Player.Attack.performed += ctx => AttemptAttack();
+
+        rb = GetComponent<Rigidbody>();
     }
 
     private void OnEnable() => controls.Enable();
@@ -55,7 +38,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isKnockedBack && !isAttacking)
+        if (!isKnockedBack)
         {
             rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
         }
@@ -122,78 +105,13 @@ public class PlayerMovement : MonoBehaviour
         isKnockedBack = true;
 
         Vector3 knockbackDirection = (transform.position - damageSource).normalized;
-        knockbackDirection.y = 0.5f;
+        knockbackDirection.y = 0.5f; 
 
-        rb.linearVelocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero; 
         rb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
 
         yield return new WaitForSeconds(knockbackDuration);
 
         isKnockedBack = false;
     }
-
-    // =========================
-    // Combo Attack Logic (Punches/Kicks)
-    // =========================
-    private void AttemptAttack()
-    {
-        if (isAttacking) return;
-
-        comboStep++;
-        if (comboStep > 3) comboStep = 1;
-
-        if (comboResetCoroutine != null)
-            StopCoroutine(comboResetCoroutine);
-
-        comboResetCoroutine = StartCoroutine(ResetComboAfterDelay());
-
-        StartCoroutine(PerformAttackTilt(comboStep));
-    }
-
-    private IEnumerator ResetComboAfterDelay()
-    {
-        yield return new WaitForSeconds(comboResetTime);
-        comboStep = 0;
-    }
-
-    private void DetectAndDamageEnemies()
-    {
-        Vector3 attackOrigin = transform.position + (transform.right * attackBoxOffset.x);
-        Collider[] hitEnemies = Physics.OverlapBox(attackOrigin, attackBoxSize / 2f, Quaternion.identity, enemyLayer);
-
-        foreach (Collider enemy in hitEnemies)
-        {
-            EnemyHealth health = enemy.GetComponent<EnemyHealth>();
-            if (health != null)
-            {
-                health.TakeDamage(attackDamage);
-            }
-        }
-    }
-
-
-    private IEnumerator PerformAttackTilt(int step)
-    {
-        isAttacking = true;
-        float tiltDuration = 0.15f;
-
-        Quaternion attackRotation = originalRotation;
-
-        switch (step)
-        {
-            case 1: attackRotation = Quaternion.Euler(0, 0, 20f); break;
-            case 2: attackRotation = Quaternion.Euler(0, 0, -20f); break;
-            case 3: attackRotation = Quaternion.Euler(20f, 0, 0); break;
-        }
-
-        transform.rotation = attackRotation;
-
-        // Call damage function
-        DetectAndDamageEnemies();
-
-        yield return new WaitForSeconds(tiltDuration);
-        transform.rotation = originalRotation;
-        isAttacking = false;
-    }
-
 }
