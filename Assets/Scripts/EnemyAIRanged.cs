@@ -1,16 +1,20 @@
 using UnityEngine;
 using System.Collections;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAIRanged : MonoBehaviour
 {
     public float moveSpeed = 3f;
     public float jumpForce = 8f;
     public float detectionRange = 7f;
     public float attackRange = 1.8f;
+    public float runAwayRange = 5f;
+    public float throwProjectileRange = 4f;
     public float dashForce = 10f;
     public float attackCooldown = 2f;
     public float patrolTime = 2f;
     public float chaseLostDuration = 5f;
+    public GameObject projectilePrefab;
+    public float knockbackForce = 5f;
 
     public Transform edgeCheck, edgeCheckLeft;
     public Transform upperPlatformCheck, upperPlatformCheckLeft;
@@ -18,9 +22,8 @@ public class EnemyAI : MonoBehaviour
     public Transform groundCheck;
     public LayerMask groundLayer;
     public int attackDamage = 20;
-    public float attackCooldownMin = 1f; 
-    public float attackCooldownMax = 3f; 
-
+    public float attackCooldownMin = 1f;
+    public float attackCooldownMax = 3f;
 
     private Rigidbody rb;
     private bool isGrounded;
@@ -30,11 +33,8 @@ public class EnemyAI : MonoBehaviour
     private bool isAttacking = false;
     private float searchTimer = 0f;
     private float lastAttackTime = 0f;
-    public float knockbackForce = 5f;
     private float attackCooldownTimer = 0f;
     private float nextComboTime = 0f;
-
-
 
     private Vector3 movementDirection;
     private Vector3 lastSeenPlayerPosition;
@@ -67,6 +67,14 @@ public class EnemyAI : MonoBehaviour
                     StartCoroutine(PerformAttack());
                 }
             }
+            else if (distanceToPlayer <= runAwayRange)
+            {
+                RunAwayFromPlayer();
+            }
+            else if (distanceToPlayer <= throwProjectileRange)
+            {
+                ThrowProjectile();
+            }
             else
             {
                 ChasePlayer();
@@ -82,7 +90,6 @@ public class EnemyAI : MonoBehaviour
         if (isSearching)
         {
             searchTimer -= Time.fixedDeltaTime;
-
             if (searchTimer > 0)
             {
                 MoveToLastSeenDirection();
@@ -118,9 +125,13 @@ public class EnemyAI : MonoBehaviour
     {
         if (player == null) return;
 
-        Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-        movementDirection = new Vector3(Mathf.Sign(directionToPlayer.x), 0, 0);
-        rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        if (distanceToPlayer > runAwayRange && distanceToPlayer <= detectionRange)
+        {
+            Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+            movementDirection = new Vector3(Mathf.Sign(directionToPlayer.x), 0, 0);
+            rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        }
     }
 
     private void MoveToLastSeenDirection()
@@ -128,6 +139,68 @@ public class EnemyAI : MonoBehaviour
         Vector3 direction = (lastSeenPlayerPosition - transform.position).normalized;
         movementDirection = new Vector3(Mathf.Sign(direction.x), 0, 0);
         rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+    }
+
+    private void RunAwayFromPlayer()
+    {
+        if (player == null) return;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        if (distanceToPlayer <= runAwayRange && distanceToPlayer > attackRange)
+        {
+            Vector3 directionAwayFromPlayer = (transform.position - player.transform.position).normalized;
+            movementDirection = new Vector3(Mathf.Sign(directionAwayFromPlayer.x), 0, 0);
+            rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        }
+    }
+
+    private void ThrowProjectile()
+    {
+        if (projectilePrefab != null && Time.time >= lastAttackTime + attackCooldown)
+        {
+            lastAttackTime = Time.time;
+
+            GameObject projectile = Instantiate(projectilePrefab, transform.position + Vector3.up, Quaternion.identity);
+            Vector3 direction = (player.transform.position - transform.position).normalized;
+
+            Rigidbody rbProjectile = projectile.GetComponent<Rigidbody>();
+            if (rbProjectile != null)
+            {
+                rbProjectile.linearVelocity = direction * 10f; 
+            }
+
+            StartCoroutine(HandleProjectileDamage(projectile));
+        }
+    }
+
+
+    private IEnumerator HandleProjectileDamage(GameObject projectile)
+    {
+        float lifetime = 3f;
+        float timer = 0f;
+
+        while (projectile != null && timer < lifetime)
+        {
+            if (player != null && Vector3.Distance(projectile.transform.position, player.transform.position) < 1.5f)
+            {
+                PlayerHealth health = player.GetComponent<PlayerHealth>();
+                if (health != null)
+                {
+                    health.TakeDamage(attackDamage);
+                }
+
+                Destroy(projectile);
+                break;
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (projectile != null)
+        {
+            Destroy(projectile);
+        }
     }
 
     private IEnumerator RandomBehavior()
@@ -153,7 +226,6 @@ public class EnemyAI : MonoBehaviour
     private void CheckForPlatformsAndEdges()
     {
         bool movingRight = movementDirection.x > 0;
-
         Transform edgeCheckPos = movingRight ? edgeCheck : edgeCheckLeft;
         Transform upperCheckPos = movingRight ? upperPlatformCheck : upperPlatformCheckLeft;
         Transform lowerCheckPos = movingRight ? lowerPlatformCheck : lowerPlatformCheckLeft;
@@ -161,27 +233,24 @@ public class EnemyAI : MonoBehaviour
         bool edgeDetected = !Physics.Raycast(edgeCheckPos.position, Vector3.down, 1f, groundLayer);
 
         RaycastHit upperHit;
-        Vector3 rayDirection = (upperCheckPos.position - edgeCheckPos.position).normalized;
-        float rayDistance = Vector3.Distance(edgeCheckPos.position, upperCheckPos.position);
-        bool upperPlatformDetected = Physics.Raycast(edgeCheckPos.position, rayDirection, out upperHit, rayDistance, groundLayer);
+        bool upperDetected = Physics.Raycast(edgeCheckPos.position, (upperCheckPos.position - edgeCheckPos.position).normalized, out upperHit, Vector3.Distance(edgeCheckPos.position, upperCheckPos.position), groundLayer);
 
         RaycastHit lowerHit;
-        bool lowerPlatformDetected = Physics.Raycast(lowerCheckPos.position, movementDirection, out lowerHit, 1.5f, groundLayer);
+        bool lowerDetected = Physics.Raycast(lowerCheckPos.position, movementDirection, out lowerHit, 1.5f, groundLayer);
 
         RaycastHit headHit;
         bool headBlocked = Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.up, out headHit, upperCheckPos.position.y - (transform.position.y + 0.5f), groundLayer);
 
-        if (upperPlatformDetected && isGrounded && !headBlocked)
+        if (upperDetected && isGrounded && !headBlocked)
         {
             float platformY = upperHit.point.y;
             float enemyY = transform.position.y;
-
             if (platformY > enemyY + 0.2f)
             {
                 Jump();
             }
         }
-        else if (edgeDetected && lowerPlatformDetected && isGrounded)
+        else if (edgeDetected && lowerDetected && isGrounded)
         {
             StartCoroutine(DelayedJump());
         }
@@ -221,24 +290,15 @@ public class EnemyAI : MonoBehaviour
     private IEnumerator PerformAttack()
     {
         isAttacking = true;
-        int comboCount = Random.Range(1, 4); 
+        int comboCount = Random.Range(1, 4);
 
         for (int i = 0; i < comboCount; i++)
         {
-            int attackType = Random.Range(0, 3); 
+            int attackType = Random.Range(0, 3);
 
-            if (attackType == 0)
-            {
-                transform.rotation = Quaternion.Euler(0, 0, 10); 
-            }
-            else if (attackType == 1)
-            {
-                transform.rotation = Quaternion.Euler(0, 0, -10); 
-            }
-            else if (attackType == 2)
-            {
-                transform.rotation = Quaternion.Euler(50, 0, -50); 
-            }
+            if (attackType == 0) transform.rotation = Quaternion.Euler(0, 0, 10);
+            else if (attackType == 1) transform.rotation = Quaternion.Euler(0, 0, -10);
+            else if (attackType == 2) transform.rotation = Quaternion.Euler(50, 0, -50);
 
             if (Vector3.Distance(transform.position, player.transform.position) < 2f)
             {
@@ -248,36 +308,19 @@ public class EnemyAI : MonoBehaviour
                     playerHealth.TakeDamage(attackDamage);
                 }
 
-                Vector3 knockbackDirection = (player.transform.position - transform.position).normalized;
+                Vector3 knockbackDir = (player.transform.position - transform.position).normalized;
                 Rigidbody playerRb = player.GetComponent<Rigidbody>();
                 if (playerRb != null)
                 {
-                    playerRb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+                    playerRb.AddForce(knockbackDir * knockbackForce, ForceMode.Impulse);
                 }
             }
 
-            yield return new WaitForSeconds(0.3f); 
-
-            
-            transform.rotation = Quaternion.identity;
-            yield return new WaitForSeconds(0.2f); 
+            yield return new WaitForSeconds(0.4f);
         }
 
-        
-        float randomCooldown = Random.Range(attackCooldownMin, attackCooldownMax);
-        yield return new WaitForSeconds(randomCooldown);
-
+        transform.rotation = Quaternion.identity;
+        nextComboTime = Time.time + Random.Range(attackCooldownMin, attackCooldownMax);
         isAttacking = false;
-    }
-
-
-
-
-    private void DashTowardsPlayer()
-    {
-        if (player == null) return;
-
-        Vector3 direction = (player.transform.position - transform.position).normalized;
-        rb.AddForce(new Vector3(Mathf.Sign(direction.x) * dashForce, 0, 0), ForceMode.Impulse);
     }
 }
