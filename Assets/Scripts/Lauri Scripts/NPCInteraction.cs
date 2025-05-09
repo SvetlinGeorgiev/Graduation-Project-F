@@ -7,23 +7,39 @@ using System.Collections;
 public class NPCInteraction : MonoBehaviour
 {
     public string playerTag = "Player";
-    public AudioClip interactionSound; // Sound to play 
-    public GameObject dialogueUI; // UI element for talking
+    public AudioClip interactionSound;
+    public GameObject dialogueUI;
     public TextMeshProUGUI dialogueText;
     public string[] dialogueLines;
-    public GameObject questUI; // Quest for upper corner
+    public GameObject questUI;
     public TextMeshProUGUI questText;
     public string questDescription;
+
+    public ScreenSpaceDialogue screenSpaceDialogue;
 
     private AudioSource audioSource;
     private int currentDialogueIndex = 0;
     private bool isPlayerInRange = false;
     public bool questCompleted = false;
 
+    public enum DialogueMode { WorldSpace, ScreenSpace }
+    public DialogueMode dialogueMode = DialogueMode.WorldSpace;
+
+    private PlayerMovement playerMovement;
+    private float originalMoveSpeed;
+    private float originalJumpForce;
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        dialogueUI.SetActive(false); // Hide dialogue UI initially
+        if (dialogueUI != null)
+        {
+            dialogueUI.SetActive(false);
+        }
+        if (screenSpaceDialogue != null)
+        {
+            screenSpaceDialogue.HideDialogue();
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -33,7 +49,8 @@ public class NPCInteraction : MonoBehaviour
             isPlayerInRange = true;
             PlayInteractionSound();
 
-            // Only start dialogue if the quest is not completed
+            playerMovement = other.GetComponent<PlayerMovement>();
+
             if (!questCompleted)
             {
                 StartDialogue();
@@ -62,21 +79,56 @@ public class NPCInteraction : MonoBehaviour
     {
         if (dialogueLines.Length > 0)
         {
-            dialogueUI.SetActive(true);
-            dialogueText.text = dialogueLines[currentDialogueIndex];
+            if (playerMovement != null)
+            {
+                originalMoveSpeed = playerMovement.moveSpeed;
+                originalJumpForce = playerMovement.jumpForce;
+
+                playerMovement.moveSpeed = 0f;
+                playerMovement.jumpForce = 0f;
+            }
+
+            if (dialogueMode == DialogueMode.WorldSpace)
+            {
+                if (dialogueUI != null)
+                {
+                    dialogueUI.SetActive(true);
+                    dialogueText.text = dialogueLines[currentDialogueIndex];
+                }
+            }
+            else if (dialogueMode == DialogueMode.ScreenSpace)
+            {
+                if (screenSpaceDialogue != null)
+                {
+                    screenSpaceDialogue.ShowDialogue(dialogueLines[currentDialogueIndex]);
+                }
+            }
         }
     }
 
     void Update()
     {
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E)) // Press 'E' to continue dialogue
+        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
         {
-            if (!questCompleted) // Only allow dialogue if the quest is not completed
+            if (!questCompleted)
             {
                 currentDialogueIndex++;
                 if (currentDialogueIndex < dialogueLines.Length)
                 {
-                    dialogueText.text = dialogueLines[currentDialogueIndex];
+                    if (dialogueMode == DialogueMode.WorldSpace)
+                    {
+                        if (dialogueUI != null)
+                        {
+                            dialogueText.text = dialogueLines[currentDialogueIndex];
+                        }
+                    }
+                    else if (dialogueMode == DialogueMode.ScreenSpace)
+                    {
+                        if (screenSpaceDialogue != null)
+                        {
+                            screenSpaceDialogue.ShowDialogue(dialogueLines[currentDialogueIndex]);
+                        }
+                    }
                 }
                 else
                 {
@@ -89,7 +141,27 @@ public class NPCInteraction : MonoBehaviour
 
     void EndDialogue()
     {
-        dialogueUI.SetActive(false);
+        if (dialogueMode == DialogueMode.WorldSpace)
+        {
+            if (dialogueUI != null)
+            {
+                dialogueUI.SetActive(false);
+            }
+        }
+        else if (dialogueMode == DialogueMode.ScreenSpace)
+        {
+            if (screenSpaceDialogue != null)
+            {
+                screenSpaceDialogue.HideDialogue();
+            }
+        }
+
+        if (playerMovement != null)
+        {
+            playerMovement.moveSpeed = originalMoveSpeed;
+            playerMovement.jumpForce = originalJumpForce;
+        }
+
         currentDialogueIndex = 0;
     }
 
@@ -106,18 +178,18 @@ public class NPCInteraction : MonoBehaviour
     {
         if (questUI != null && questText != null)
         {
-            questText.text = "Quest Completed!"; // Update the quest UI
-            questCompleted = true; // Mark the quest as completed
-            StartCoroutine(FadeOutQuestText()); // Start fading out the text
+            questText.text = "Quest Completed!";
+            questCompleted = true;
+            StartCoroutine(FadeOutQuestText());
         }
     }
 
     private IEnumerator FadeOutQuestText()
     {
-        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        yield return new WaitForSeconds(5f);
 
         Color originalColor = questText.color;
-        float fadeDuration = 2f; // Duration of the fade-out
+        float fadeDuration = 2f;
         float elapsedTime = 0f;
 
         while (elapsedTime < fadeDuration)
@@ -128,7 +200,7 @@ public class NPCInteraction : MonoBehaviour
             yield return null;
         }
 
-        questText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0f); // Ensure it's fully transparent
-        questUI.SetActive(false); // Optionally hide the quest UI
+        questText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
+        questUI.SetActive(false);
     }
 }

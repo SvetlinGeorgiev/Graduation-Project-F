@@ -26,7 +26,7 @@ public class QuestCompletionNPC : MonoBehaviour
 
     void Update()
     {
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E)) // Press 'E' to interact
+        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E)) // Press 'E' 
         {
             CompleteQuest();
         }
@@ -44,7 +44,7 @@ public class QuestCompletionNPC : MonoBehaviour
     {
         if (questGiver != null && !questGiver.questCompleted)
         {
-            questGiver.CompleteQuest(); // Mark the quest as completed
+            questGiver.CompleteQuest(); 
             Debug.Log("Quest completed by interacting with this NPC.");
         }
     }
