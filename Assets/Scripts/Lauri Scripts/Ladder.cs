@@ -19,7 +19,14 @@ public class Ladder : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isClimbing = false;
-            player.GetComponent<Rigidbody>().useGravity = true; // Ensure gravity is re-enabled
+
+            var movement = player.GetComponent<PlayerMovement>();
+            movement.isClimbing = false;
+            movement.canAttack = true;
+
+            Rigidbody rb = player.GetComponent<Rigidbody>();
+            rb.useGravity = true;
+
             player = null;
         }
     }
@@ -29,7 +36,14 @@ public class Ladder : MonoBehaviour
         if (player != null && Input.GetKeyDown(KeyCode.E))
         {
             isClimbing = true;
-            player.GetComponent<Rigidbody>().useGravity = false;
+
+            Rigidbody rb = player.GetComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.linearVelocity = Vector3.zero; 
+
+            var movement = player.GetComponent<PlayerMovement>();
+            movement.isClimbing = true;
+            movement.canAttack = false;
         }
 
         if (isClimbing)
@@ -40,7 +54,14 @@ public class Ladder : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 isClimbing = false;
-                player.GetComponent<Rigidbody>().useGravity = true;
+
+                var movement = player.GetComponent<PlayerMovement>();
+                movement.isClimbing = false;
+                movement.canAttack = true;
+                movement.canDoubleJump = false;
+
+                Rigidbody rb = player.GetComponent<Rigidbody>();
+                rb.useGravity = true;
             }
         }
     }

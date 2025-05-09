@@ -38,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
 
     private Quaternion originalRotation;
 
+    public bool isClimbing = false;
+    public bool canAttack = true;
+
     private void Awake()
     {
         controls = new PlayerControls();
@@ -55,14 +58,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isKnockedBack && !isAttacking)
+        if (!isKnockedBack && !isAttacking && !isClimbing)
         {
             rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
         }
+
     }
 
     private void Jump()
     {
+        if (isClimbing)
+            return; // Don't allow jumping while on a ladder
+
         if (isGrounded)
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
@@ -76,6 +83,7 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(FlipAnimation());
         }
     }
+
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -132,12 +140,9 @@ public class PlayerMovement : MonoBehaviour
         isKnockedBack = false;
     }
 
-    // =========================
-    // Combo Attack Logic (Punches/Kicks)
-    // =========================
     private void AttemptAttack()
     {
-        if (isAttacking) return;
+        if (isAttacking || !canAttack) return;
 
         comboStep++;
         if (comboStep > 3) comboStep = 1;
