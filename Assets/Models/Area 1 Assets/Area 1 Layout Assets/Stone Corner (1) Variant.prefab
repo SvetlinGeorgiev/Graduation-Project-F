@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Stone Corner (1) Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 1414945641930856, guid: e9272a16613b47647a23674a6989e733, type: 3}
+      propertyPath: m_TagString
+      value: Ground
+      objectReference: {fileID: 0}
     - target: {fileID: 814824213883747026, guid: e9272a16613b47647a23674a6989e733, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.55
@@ -63,5 +67,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1414945641930856, guid: e9272a16613b47647a23674a6989e733, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1651981156610208824}
   m_SourcePrefab: {fileID: 100100000, guid: e9272a16613b47647a23674a6989e733, type: 3}
+--- !u!1 &6576421924341071605 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1414945641930856, guid: e9272a16613b47647a23674a6989e733, type: 3}
+  m_PrefabInstance: {fileID: 6575574344954388125}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &1651981156610208824
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6576421924341071605}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10.2453165, y: 9.9586525, z: 12.2574}
+  m_Center: {x: -5.1316514, y: 4.973277, z: -4.6890755}
