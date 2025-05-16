@@ -6,6 +6,9 @@ public class EnemyAI : MonoBehaviour
     public float moveSpeed = 3f;
     public float jumpForce = 8f;
     public float detectionRange = 7f;
+    public float attackRange = 1.8f;
+    public float dashForce = 10f;
+    public float attackCooldown = 2f;
     public float patrolTime = 2f;
     public float chaseLostDuration = 5f;
 
@@ -14,13 +17,24 @@ public class EnemyAI : MonoBehaviour
     public Transform lowerPlatformCheck, lowerPlatformCheckLeft;
     public Transform groundCheck;
     public LayerMask groundLayer;
+    public int attackDamage = 20;
+    public float attackCooldownMin = 1f; 
+    public float attackCooldownMax = 3f; 
+
 
     private Rigidbody rb;
     private bool isGrounded;
     private bool isChasing = false;
     private bool isIdle = false;
     private bool isSearching = false;
+    private bool isAttacking = false;
     private float searchTimer = 0f;
+    private float lastAttackTime = 0f;
+    public float knockbackForce = 5f;
+    private float attackCooldownTimer = 0f;
+    private float nextComboTime = 0f;
+
+
 
     private Vector3 movementDirection;
     private Vector3 lastSeenPlayerPosition;
@@ -43,7 +57,20 @@ public class EnemyAI : MonoBehaviour
             isSearching = false;
             searchTimer = 0f;
             lastSeenPlayerPosition = player.transform.position;
-            ChasePlayer();
+
+            float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+            if (distanceToPlayer <= attackRange)
+            {
+                if (!isAttacking && Time.time >= nextComboTime)
+                {
+                    StartCoroutine(PerformAttack());
+                }
+            }
+            else
+            {
+                ChasePlayer();
+            }
         }
         else if (isChasing)
         {
@@ -78,7 +105,6 @@ public class EnemyAI : MonoBehaviour
     private bool CanSeePlayer()
     {
         if (player == null) return false;
-
         float distance = Vector3.Distance(transform.position, player.transform.position);
         return distance <= detectionRange;
     }
@@ -190,5 +216,68 @@ public class EnemyAI : MonoBehaviour
         }
 
         transform.rotation = Quaternion.identity;
+    }
+
+    private IEnumerator PerformAttack()
+    {
+        isAttacking = true;
+        int comboCount = Random.Range(1, 4); 
+
+        for (int i = 0; i < comboCount; i++)
+        {
+            int attackType = Random.Range(0, 3); 
+
+            if (attackType == 0)
+            {
+                transform.rotation = Quaternion.Euler(0, 0, 10); 
+            }
+            else if (attackType == 1)
+            {
+                transform.rotation = Quaternion.Euler(0, 0, -10); 
+            }
+            else if (attackType == 2)
+            {
+                transform.rotation = Quaternion.Euler(50, 0, -50); 
+            }
+
+            if (Vector3.Distance(transform.position, player.transform.position) < 2f)
+            {
+                PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(attackDamage);
+                }
+
+                Vector3 knockbackDirection = (player.transform.position - transform.position).normalized;
+                Rigidbody playerRb = player.GetComponent<Rigidbody>();
+                if (playerRb != null)
+                {
+                    playerRb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+                }
+            }
+
+            yield return new WaitForSeconds(0.3f); 
+
+            
+            transform.rotation = Quaternion.identity;
+            yield return new WaitForSeconds(0.2f); 
+        }
+
+        
+        float randomCooldown = Random.Range(attackCooldownMin, attackCooldownMax);
+        yield return new WaitForSeconds(randomCooldown);
+
+        isAttacking = false;
+    }
+
+
+
+
+    private void DashTowardsPlayer()
+    {
+        if (player == null) return;
+
+        Vector3 direction = (player.transform.position - transform.position).normalized;
+        rb.AddForce(new Vector3(Mathf.Sign(direction.x) * dashForce, 0, 0), ForceMode.Impulse);
     }
 }
