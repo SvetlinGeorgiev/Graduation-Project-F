@@ -21,7 +21,6 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask enemyLayer;
     public float attackDamage = 25f;
 
-
     [Header("Flip Settings")]
     public float flipSpeed = 360f;
 
@@ -35,6 +34,14 @@ public class PlayerMovement : MonoBehaviour
     private int comboStep = 0;
     private bool isAttacking = false;
     private Coroutine comboResetCoroutine;
+
+    [Header("Special Attack Settings")]
+    public float chainPunchCooldown = 5f;
+    public int chainPunchCount = 5;
+    public float chainPunchTiltDuration = 0.5f;
+    public float chainPunchResetDuration = 0.3f;
+    private bool isChainPunching = false;
+    private bool canUseChainPunch = true;
 
     private Quaternion originalRotation;
 
@@ -51,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Jump.performed += ctx => Jump();
         controls.Player.Attack.performed += ctx => AttemptAttack();
+        controls.Player.SpecialAttack.performed += ctx => TryChainPunch();
     }
 
     private void OnEnable() => controls.Enable();
@@ -58,17 +66,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isKnockedBack && !isAttacking && !isClimbing)
+        if (!isKnockedBack && !isAttacking && !isClimbing && !isChainPunching)
         {
             rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
         }
-
     }
 
     private void Jump()
     {
         if (isClimbing)
-            return; // Don't allow jumping while on a ladder
+            return;
 
         if (isGrounded)
         {
@@ -83,7 +90,6 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(FlipAnimation());
         }
     }
-
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -142,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void AttemptAttack()
     {
-        if (isAttacking || !canAttack) return;
+        if (isAttacking || !canAttack || isChainPunching) return; 
 
         comboStep++;
         if (comboStep > 3) comboStep = 1;
@@ -176,7 +182,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
     private IEnumerator PerformAttackTilt(int step)
     {
         isAttacking = true;
@@ -193,7 +198,6 @@ public class PlayerMovement : MonoBehaviour
 
         transform.rotation = attackRotation;
 
-        // Call damage function
         DetectAndDamageEnemies();
 
         yield return new WaitForSeconds(tiltDuration);
@@ -201,4 +205,34 @@ public class PlayerMovement : MonoBehaviour
         isAttacking = false;
     }
 
+    private void TryChainPunch()
+    {
+        if (canUseChainPunch && !isChainPunching)
+        {
+            StartCoroutine(ChainPunchRoutine());
+        }
+    }
+
+    private IEnumerator ChainPunchRoutine()
+    {
+        isChainPunching = true;
+        canUseChainPunch = false;
+
+        Quaternion punchRotation = Quaternion.Euler(0, 0, -20f);
+
+        for (int i = 0; i < chainPunchCount; i++)
+        {
+            transform.rotation = punchRotation;
+            DetectAndDamageEnemies();
+            yield return new WaitForSeconds(chainPunchTiltDuration);
+
+            transform.rotation = originalRotation;
+            yield return new WaitForSeconds(chainPunchResetDuration);
+        }
+
+        isChainPunching = false;
+
+        yield return new WaitForSeconds(chainPunchCooldown);
+        canUseChainPunch = true;
+    }
 }
