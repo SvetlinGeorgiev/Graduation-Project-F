@@ -35,7 +35,7 @@ public class ArrowTrapButton : MonoBehaviour
             {
                 Vector3 direction = (player.transform.position - chosenSpawnPoint.position).normalized;
 
-                arrow.transform.rotation *= Quaternion.Euler(0, 0, 90); 
+                arrow.transform.rotation *= Quaternion.Euler(0, 90, 0); 
 
                 Rigidbody rb = arrow.GetComponent<Rigidbody>();
                 if (rb != null)
