@@ -4,13 +4,17 @@ public class Ladder : MonoBehaviour
 {
     private bool isClimbing = false;
     private GameObject player;
-    public float climbSpeed = 3f;
+    public float climbSpeed = 9f;
+
+    public Canvas climbPromptCanvas; // Reference to the world space canvas
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             player = other.gameObject;
+            if (climbPromptCanvas != null)
+                climbPromptCanvas.gameObject.SetActive(true); // Show prompt
         }
     }
 
@@ -27,6 +31,9 @@ public class Ladder : MonoBehaviour
             Rigidbody rb = player.GetComponent<Rigidbody>();
             rb.useGravity = true;
 
+            if (climbPromptCanvas != null)
+                climbPromptCanvas.gameObject.SetActive(false); // Hide prompt
+
             player = null;
         }
     }
@@ -39,11 +46,14 @@ public class Ladder : MonoBehaviour
 
             Rigidbody rb = player.GetComponent<Rigidbody>();
             rb.useGravity = false;
-            rb.linearVelocity = Vector3.zero; 
+            rb.linearVelocity = Vector3.zero;
 
             var movement = player.GetComponent<PlayerMovement>();
             movement.isClimbing = true;
             movement.canAttack = false;
+
+            if (climbPromptCanvas != null)
+                climbPromptCanvas.gameObject.SetActive(false); // Hide prompt when climbing starts
         }
 
         if (isClimbing)
