@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviour
     private PlayerControls controls;
     private Rigidbody rb;
     private Vector2 moveInput;
+    [SerializeField]
+    private Animator anim;
 
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
@@ -48,6 +50,9 @@ public class PlayerMovement : MonoBehaviour
     public bool isClimbing = false;
     public bool canAttack = true;
 
+    [SerializeField]
+    private bool facingRight = true;
+
     private void Awake()
     {
         controls = new PlayerControls();
@@ -58,6 +63,8 @@ public class PlayerMovement : MonoBehaviour
         controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Jump.performed += ctx => Jump();
         controls.Player.Attack.performed += ctx => AttemptAttack();
+        controls.Player.Kick.performed += ctx => AttemptKick();
+        controls.Player.Roll.performed += ctx => Roll();
         controls.Player.SpecialAttack.performed += ctx => TryChainPunch();
     }
 
@@ -66,36 +73,85 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isKnockedBack && !isAttacking && !isClimbing && !isChainPunching)
+        // Walking
+        if (!isKnockedBack && !isClimbing && !isChainPunching)
         {
             rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
+            // Facing Direction bool: true = right, false = left
+            if (moveInput.x > 0)
+            {
+               
+                facingRight = true;
+                anim.SetBool("FacingRight", true);
+                transform.rotation = new Quaternion(0, -1, 0,0);
+            }
+            else if (moveInput.x < 0)
+            {
+               
+                facingRight = false;
+                anim.SetBool("FacingRight", false);
+                transform.rotation = new Quaternion(0, 0, 0, 0);
+            }
         }
     }
-
+   
     private void Jump()
     {
+        Debug.Log("Jump");
         if (isClimbing)
+        {
+            Debug.Log("Jumping Climb");
             return;
-
+        }
         if (isGrounded)
         {
+            Debug.Log("Jumping grounded");
+            anim.SetTrigger("Jump");
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             isGrounded = false;
             canDoubleJump = hasDoubleJumpAbility;
+           
         }
         else if (canDoubleJump)
         {
+            Debug.Log("Jumping Double");
+            
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             canDoubleJump = false;
             StartCoroutine(FlipAnimation());
         }
     }
+    private void Roll()
+    {
+        Debug.Log("Roll"); 
+        if (isGrounded == true)
+        {
+            Debug.Log("Roll Animation");
+            anim.SetTrigger("Roll");
+            if (facingRight)
+            {
+                Debug.Log("Roll Right");
+                //rb.linearVelocity = new Vector3(jumpForce, rb.linearVelocity.y, rb.linearVelocity.z);
+                //StartCoroutine(RollAnimation("Right"));
+            }
+            else
+            {
+                Debug.Log("Roll Left");
+                //rb.linearVelocity = new Vector3(-jumpForce, rb.linearVelocity.y, rb.linearVelocity.z);
+                //StartCoroutine(RollAnimation("Left"));
+            }
+
+        }
+        return;
+    }
+
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+            anim.SetBool("Grounded",true);
         }
     }
 
@@ -103,6 +159,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
+            anim.SetBool("Grounded", false);
             isGrounded = false;
         }
     }
@@ -115,15 +172,17 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator FlipAnimation()
     {
-        float rotation = 0;
-        while (rotation < 360)
-        {
-            float step = flipSpeed * Time.deltaTime;
-            transform.Rotate(Vector3.forward, step);
-            rotation += step;
-            yield return null;
-        }
-        transform.rotation = Quaternion.identity;
+        anim.SetTrigger("DoubleJump");
+        //float rotation = 0;
+        
+        //while (rotation < 360)
+        //{
+        //    float step = flipSpeed * Time.deltaTime;
+        //    transform.Rotate(Vector3.forward, step);
+        //    rotation += step;
+          yield return null;
+        //}
+        //transform.rotation = Quaternion.identity;
     }
 
     public void TakeDamage(Vector3 damageSource)
@@ -148,17 +207,35 @@ public class PlayerMovement : MonoBehaviour
 
     private void AttemptAttack()
     {
-        if (isAttacking || !canAttack || isChainPunching) return; 
+        if (isAttacking || !canAttack || isChainPunching) return;
 
-        comboStep++;
-        if (comboStep > 3) comboStep = 1;
+        //comboStep++;
+        // if (comboStep > 3) comboStep = 1;
+        comboStep = Random.Range(1, 5);
 
         if (comboResetCoroutine != null)
             StopCoroutine(comboResetCoroutine);
+        
 
         comboResetCoroutine = StartCoroutine(ResetComboAfterDelay());
 
         StartCoroutine(PerformAttackTilt(comboStep));
+    }
+    private void AttemptKick()
+    {
+        if (isAttacking || !canAttack || isChainPunching) return;
+
+        //comboStep++;
+        // if (comboStep > 3) comboStep = 1;
+        comboStep = Random.Range(1, 3);
+
+        if (comboResetCoroutine != null)
+            StopCoroutine(comboResetCoroutine);
+
+
+        comboResetCoroutine = StartCoroutine(ResetComboAfterDelay());
+
+        StartCoroutine(PerformKick(comboStep));
     }
 
     private IEnumerator ResetComboAfterDelay()
@@ -182,26 +259,65 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private IEnumerator PerformAttackTilt(int step)
+    private IEnumerator PerformAttackTilt(int hit)
     {
         isAttacking = true;
-        float tiltDuration = 0.15f;
+        //float tiltDuration = 0.15f;
+        
 
-        Quaternion attackRotation = originalRotation;
+       // Quaternion attackRotation = originalRotation;
 
-        switch (step)
+        /*switch (step)
         {
             case 1: attackRotation = Quaternion.Euler(0, 0, 20f); break;
             case 2: attackRotation = Quaternion.Euler(0, 0, -20f); break;
             case 3: attackRotation = Quaternion.Euler(20f, 0, 0); break;
+        }*/
+
+        switch (hit)
+        {
+            case 1: anim.SetTrigger("Attack1"); break;
+            case 2: anim.SetTrigger("Attack2"); break;
+            case 3: anim.SetTrigger("Attack3"); break;
+            case 4: anim.SetTrigger("Attack4"); break;
+
         }
 
-        transform.rotation = attackRotation;
+        //transform.rotation = attackRotation;
 
         DetectAndDamageEnemies();
 
-        yield return new WaitForSeconds(tiltDuration);
-        transform.rotation = originalRotation;
+        yield return new WaitForSeconds(1f);
+        //transform.rotation = originalRotation;
+        isAttacking = false;
+    }
+    private IEnumerator PerformKick(int kick)
+    {
+        isAttacking = true;
+        //float tiltDuration = 0.15f;
+
+
+        // Quaternion attackRotation = originalRotation;
+
+        /*switch (step)
+        {
+            case 1: attackRotation = Quaternion.Euler(0, 0, 20f); break;
+            case 2: attackRotation = Quaternion.Euler(0, 0, -20f); break;
+            case 3: attackRotation = Quaternion.Euler(20f, 0, 0); break;
+        }*/
+
+        switch (kick)
+        {
+            case 1: anim.SetTrigger("Kick1"); break;
+            case 2: anim.SetTrigger("Kick2"); break;
+        }
+
+        //transform.rotation = attackRotation;
+
+        DetectAndDamageEnemies();
+
+        yield return new WaitForSeconds(1f);
+        //transform.rotation = originalRotation;
         isAttacking = false;
     }
 
