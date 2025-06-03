@@ -80,23 +80,30 @@ public class PlayerMovement : MonoBehaviour
             // Facing Direction bool: true = right, false = left
             if (moveInput.x > 0)
             {
-               
+                anim.SetBool("Walk", true);
                 facingRight = true;
                 anim.SetBool("FacingRight", true);
-                transform.rotation = new Quaternion(0, -1, 0,0);
+                transform.rotation = new Quaternion(0, -1, 0, 0);
             }
             else if (moveInput.x < 0)
             {
-               
+                anim.SetBool("Walk", true);
                 facingRight = false;
                 anim.SetBool("FacingRight", false);
                 transform.rotation = new Quaternion(0, 0, 0, 0);
             }
+            else if (moveInput.x == 0)
+            {
+                anim.SetBool("Walk", false);
+            }
+          
+
         }
     }
    
     private void Jump()
     {
+        anim.SetBool("Walk", false);
         Debug.Log("Jump");
         if (isClimbing)
         {
@@ -106,10 +113,13 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded)
         {
             Debug.Log("Jumping grounded");
-            anim.SetTrigger("Jump");
+           
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             isGrounded = false;
+            anim.SetTrigger("Jump");
+            anim.SetBool("Walk", false);
             canDoubleJump = hasDoubleJumpAbility;
+
            
         }
         else if (canDoubleJump)
@@ -160,6 +170,7 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             anim.SetBool("Grounded", false);
+
             isGrounded = false;
         }
     }
@@ -173,14 +184,15 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator FlipAnimation()
     {
         anim.SetTrigger("DoubleJump");
+        anim.SetBool("Walk", false);
         //float rotation = 0;
-        
+
         //while (rotation < 360)
         //{
         //    float step = flipSpeed * Time.deltaTime;
         //    transform.Rotate(Vector3.forward, step);
         //    rotation += step;
-          yield return null;
+        yield return null;
         //}
         //transform.rotation = Quaternion.identity;
     }
