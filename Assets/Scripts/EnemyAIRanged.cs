@@ -156,7 +156,6 @@ public class EnemyAIRanged : MonoBehaviour
 
     private void ThrowProjectile()
     {
-        Debug.Log("Throw projectile");
         if (projectilePrefab != null && Time.time >= lastAttackTime + attackCooldown)
         {
             lastAttackTime = Time.time;
@@ -179,7 +178,7 @@ public class EnemyAIRanged : MonoBehaviour
     {
         float lifetime = 3f;
         float timer = 0f;
-        Debug.Log("Handle projectile");
+
         while (projectile != null && timer < lifetime)
         {
             if (player != null && Vector3.Distance(projectile.transform.position, player.transform.position) < 1.5f)
@@ -188,7 +187,6 @@ public class EnemyAIRanged : MonoBehaviour
                 if (health != null)
                 {
                     health.TakeDamage(attackDamage);
-                    Debug.Log("Damage projectile");
                 }
 
                 Destroy(projectile);
