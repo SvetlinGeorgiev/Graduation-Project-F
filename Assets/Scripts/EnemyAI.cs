@@ -43,13 +43,11 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
 {
-    // Keep the enemy on the correct Z plane
     Vector3 position = transform.position;
     transform.position = new Vector3(position.x, position.y, -16.43f);
 
     if (player == null) return;
 
-    // Always trigger jump if on NavMeshLink
     if (agent.isOnOffMeshLink && !isAttacking && !isJumping)
     {
         StartCoroutine(TraverseNavMeshLink());
