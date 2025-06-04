@@ -1,0 +1,1055 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!74 &-1486752734533772139
+AnimationClip:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 'Curves: Background'
+  serializedVersion: 7
+  m_Legacy: 1
+  m_Compressed: 0
+  m_UseHighQualityCurve: 1
+  m_RotationCurves: []
+  m_CompressedRotationCurves: []
+  m_EulerCurves: []
+  m_PositionCurves: []
+  m_ScaleCurves: []
+  m_FloatCurves:
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0.05063291
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 19.75
+        value: 1
+        inSlope: 0.05063291
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_time
+    path: 
+    classID: 114
+    script: {fileID: 11500000, guid: 07c579aa4480ce64daff0ad6a9312d97, type: 3}
+    flags: 0
+  m_PPtrCurves: []
+  m_SampleRate: 60
+  m_WrapMode: 0
+  m_Bounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  m_ClipBindingConstant:
+    genericBindings: []
+    pptrCurveMapping: []
+  m_AnimationClipSettings:
+    serializedVersion: 2
+    m_AdditiveReferencePoseClip: {fileID: 0}
+    m_AdditiveReferencePoseTime: 0
+    m_StartTime: 0
+    m_StopTime: 19.75
+    m_OrientationOffsetY: 0
+    m_Level: 0
+    m_CycleOffset: 0
+    m_HasAdditiveReferencePose: 0
+    m_LoopTime: 0
+    m_LoopBlend: 0
+    m_LoopBlendOrientation: 0
+    m_LoopBlendPositionY: 0
+    m_LoopBlendPositionXZ: 0
+    m_KeepOriginalOrientation: 0
+    m_KeepOriginalPositionY: 1
+    m_KeepOriginalPositionXZ: 0
+    m_HeightFromFeet: 0
+    m_Mirror: 0
+  m_EditorCurves:
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0.05063291
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 19.75
+        value: 1
+        inSlope: 0.05063291
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_time
+    path: 
+    classID: 114
+    script: {fileID: 11500000, guid: 07c579aa4480ce64daff0ad6a9312d97, type: 3}
+    flags: 0
+  m_EulerEditorCurves: []
+  m_HasGenericRootTransform: 0
+  m_HasMotionFloatCurves: 0
+  m_Events: []
+--- !u!114 &-1101622679375416446
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 588b3cca60f217d438ef96013ebfdb06, type: 3}
+  m_Name: Streaming Image Sequence Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0
+    m_ClipIn: 0
+    m_Asset: {fileID: 2757569914168404845}
+    m_Duration: 19.749999523162852
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: -1101622679375416446}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: -1486752734533772139}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: Infinity
+    m_PreExtrapolationTime: 0
+    m_DisplayName: Background
+  m_Markers:
+    m_Objects: []
+  m_obsoleteClipDataCollection:
+    m_keys: []
+    m_values: []
+  m_obsoleteHashClipDataCollection:
+    m_keys: 
+    m_values: []
+  m_serializedDataCollection:
+  - m_baseClipDataVersion: 1
+    m_playableFrames: []
+    m_frameMarkersRequested: 0
+    m_playableFrameClipDataVersion: 1
+    m_sisClipDataVersion: 1
+    m_animationCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  m_baseExtendedClipTrackVersion: 2
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: BG
+  m_EditorClassIdentifier: 
+  m_Version: 0
+  m_Tracks:
+  - {fileID: -1101622679375416446}
+  m_FixedDuration: 0
+  m_EditorSettings:
+    m_Framerate: 20
+    m_ScenePreview: 1
+  m_DurationMode: 0
+  m_MarkerTrack: {fileID: 0}
+--- !u!114 &2757569914168404845
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07c579aa4480ce64daff0ad6a9312d97, type: 3}
+  m_Name: StreamingImageSequencePlayableAsset
+  m_EditorClassIdentifier: 
+  m_folder: Assets/Models/StreamingAssets/Background
+  m_imageFiles:
+  - m_name: 0035.png
+    m_size: 2777200
+  - m_name: 0036.png
+    m_size: 2777178
+  - m_name: 0037.png
+    m_size: 2779743
+  - m_name: 0038.png
+    m_size: 2776734
+  - m_name: 0039.png
+    m_size: 2779965
+  - m_name: 0040.png
+    m_size: 2780196
+  - m_name: 0041.png
+    m_size: 2779716
+  - m_name: 0042.png
+    m_size: 2781314
+  - m_name: 0043.png
+    m_size: 2781092
+  - m_name: 0044.png
+    m_size: 2783694
+  - m_name: 0045.png
+    m_size: 2784459
+  - m_name: 0046.png
+    m_size: 2781865
+  - m_name: 0047.png
+    m_size: 2780598
+  - m_name: 0048.png
+    m_size: 2784093
+  - m_name: 0049.png
+    m_size: 2782030
+  - m_name: 0050.png
+    m_size: 2785755
+  - m_name: 0051.png
+    m_size: 2784459
+  - m_name: 0052.png
+    m_size: 2787617
+  - m_name: 0053.png
+    m_size: 2787970
+  - m_name: 0054.png
+    m_size: 2786841
+  - m_name: 0055.png
+    m_size: 2787669
+  - m_name: 0056.png
+    m_size: 2790371
+  - m_name: 0057.png
+    m_size: 2789659
+  - m_name: 0058.png
+    m_size: 2792565
+  - m_name: 0059.png
+    m_size: 2794360
+  - m_name: 0060.png
+    m_size: 2794316
+  - m_name: 0061.png
+    m_size: 2793860
+  - m_name: 0062.png
+    m_size: 2798105
+  - m_name: 0063.png
+    m_size: 2801577
+  - m_name: 0064.png
+    m_size: 2803244
+  - m_name: 0065.png
+    m_size: 2803210
+  - m_name: 0066.png
+    m_size: 2803326
+  - m_name: 0067.png
+    m_size: 2803213
+  - m_name: 0068.png
+    m_size: 2806312
+  - m_name: 0069.png
+    m_size: 2808298
+  - m_name: 0070.png
+    m_size: 2808757
+  - m_name: 0071.png
+    m_size: 2811317
+  - m_name: 0072.png
+    m_size: 2812922
+  - m_name: 0073.png
+    m_size: 2813049
+  - m_name: 0074.png
+    m_size: 2813940
+  - m_name: 0075.png
+    m_size: 2814413
+  - m_name: 0076.png
+    m_size: 2816418
+  - m_name: 0077.png
+    m_size: 2820801
+  - m_name: 0078.png
+    m_size: 2820743
+  - m_name: 0079.png
+    m_size: 2818713
+  - m_name: 0080.png
+    m_size: 2822171
+  - m_name: 0081.png
+    m_size: 2823498
+  - m_name: 0082.png
+    m_size: 2824701
+  - m_name: 0083.png
+    m_size: 2825108
+  - m_name: 0084.png
+    m_size: 2826914
+  - m_name: 0085.png
+    m_size: 2826890
+  - m_name: 0086.png
+    m_size: 2827653
+  - m_name: 0087.png
+    m_size: 2830232
+  - m_name: 0088.png
+    m_size: 2830366
+  - m_name: 0089.png
+    m_size: 2828084
+  - m_name: 0090.png
+    m_size: 2827809
+  - m_name: 0091.png
+    m_size: 2828009
+  - m_name: 0092.png
+    m_size: 2828816
+  - m_name: 0093.png
+    m_size: 2826422
+  - m_name: 0094.png
+    m_size: 2829490
+  - m_name: 0095.png
+    m_size: 2826492
+  - m_name: 0096.png
+    m_size: 2824298
+  - m_name: 0097.png
+    m_size: 2825483
+  - m_name: 0098.png
+    m_size: 2822038
+  - m_name: 0099.png
+    m_size: 2822925
+  - m_name: 0100.png
+    m_size: 2822002
+  - m_name: 0101.png
+    m_size: 2821875
+  - m_name: 0102.png
+    m_size: 2820496
+  - m_name: 0103.png
+    m_size: 2819351
+  - m_name: 0104.png
+    m_size: 2819562
+  - m_name: 0105.png
+    m_size: 2817801
+  - m_name: 0106.png
+    m_size: 2814177
+  - m_name: 0107.png
+    m_size: 2811278
+  - m_name: 0108.png
+    m_size: 2808904
+  - m_name: 0109.png
+    m_size: 2807786
+  - m_name: 0110.png
+    m_size: 2808281
+  - m_name: 0111.png
+    m_size: 2805146
+  - m_name: 0112.png
+    m_size: 2804327
+  - m_name: 0113.png
+    m_size: 2802822
+  - m_name: 0114.png
+    m_size: 2804220
+  - m_name: 0115.png
+    m_size: 2806508
+  - m_name: 0116.png
+    m_size: 2802781
+  - m_name: 0117.png
+    m_size: 2803769
+  - m_name: 0118.png
+    m_size: 2804435
+  - m_name: 0119.png
+    m_size: 2803416
+  - m_name: 0120.png
+    m_size: 2800938
+  - m_name: 0121.png
+    m_size: 2797875
+  - m_name: 0122.png
+    m_size: 2804690
+  - m_name: 0123.png
+    m_size: 2799825
+  - m_name: 0124.png
+    m_size: 2801912
+  - m_name: 0125.png
+    m_size: 2805226
+  - m_name: 0126.png
+    m_size: 2802704
+  - m_name: 0127.png
+    m_size: 2800507
+  - m_name: 0128.png
+    m_size: 2800758
+  - m_name: 0129.png
+    m_size: 2801487
+  - m_name: 0130.png
+    m_size: 2800573
+  - m_name: 0131.png
+    m_size: 2799460
+  - m_name: 0132.png
+    m_size: 2803956
+  - m_name: 0133.png
+    m_size: 2803183
+  - m_name: 0134.png
+    m_size: 2806331
+  - m_name: 0135.png
+    m_size: 2804633
+  - m_name: 0136.png
+    m_size: 2803271
+  - m_name: 0137.png
+    m_size: 2802460
+  - m_name: 0138.png
+    m_size: 2800337
+  - m_name: 0139.png
+    m_size: 2803486
+  - m_name: 0140.png
+    m_size: 2804254
+  - m_name: 0141.png
+    m_size: 2802093
+  - m_name: 0142.png
+    m_size: 2801931
+  - m_name: 0143.png
+    m_size: 2801674
+  - m_name: 0144.png
+    m_size: 2803735
+  - m_name: 0145.png
+    m_size: 2801914
+  - m_name: 0146.png
+    m_size: 2802443
+  - m_name: 0147.png
+    m_size: 2803023
+  - m_name: 0148.png
+    m_size: 2804634
+  - m_name: 0149.png
+    m_size: 2801991
+  - m_name: 0150.png
+    m_size: 2801106
+  - m_name: 0151.png
+    m_size: 2801565
+  - m_name: 0152.png
+    m_size: 2802017
+  - m_name: 0153.png
+    m_size: 2802060
+  - m_name: 0154.png
+    m_size: 2801302
+  - m_name: 0155.png
+    m_size: 2801508
+  - m_name: 0156.png
+    m_size: 2800436
+  - m_name: 0157.png
+    m_size: 2800511
+  - m_name: 0158.png
+    m_size: 2801298
+  - m_name: 0159.png
+    m_size: 2799880
+  - m_name: 0160.png
+    m_size: 2800427
+  - m_name: 0161.png
+    m_size: 2799872
+  - m_name: 0162.png
+    m_size: 2797493
+  - m_name: 0163.png
+    m_size: 2797886
+  - m_name: 0164.png
+    m_size: 2800694
+  - m_name: 0165.png
+    m_size: 2799802
+  - m_name: 0166.png
+    m_size: 2800797
+  - m_name: 0167.png
+    m_size: 2799371
+  - m_name: 0168.png
+    m_size: 2798665
+  - m_name: 0169.png
+    m_size: 2798699
+  - m_name: 0170.png
+    m_size: 2800737
+  - m_name: 0171.png
+    m_size: 2800530
+  - m_name: 0172.png
+    m_size: 2801150
+  - m_name: 0173.png
+    m_size: 2800796
+  - m_name: 0174.png
+    m_size: 2798842
+  - m_name: 0175.png
+    m_size: 2800178
+  - m_name: 0176.png
+    m_size: 2800661
+  - m_name: 0177.png
+    m_size: 2797783
+  - m_name: 0178.png
+    m_size: 2796373
+  - m_name: 0179.png
+    m_size: 2795712
+  - m_name: 0180.png
+    m_size: 2798075
+  - m_name: 0181.png
+    m_size: 2797295
+  - m_name: 0182.png
+    m_size: 2797101
+  - m_name: 0183.png
+    m_size: 2796265
+  - m_name: 0184.png
+    m_size: 2797551
+  - m_name: 0185.png
+    m_size: 2797431
+  - m_name: 0186.png
+    m_size: 2798804
+  - m_name: 0187.png
+    m_size: 2797170
+  - m_name: 0188.png
+    m_size: 2797006
+  - m_name: 0189.png
+    m_size: 2796871
+  - m_name: 0190.png
+    m_size: 2797525
+  - m_name: 0191.png
+    m_size: 2797138
+  - m_name: 0192.png
+    m_size: 2795007
+  - m_name: 0193.png
+    m_size: 2796543
+  - m_name: 0194.png
+    m_size: 2795727
+  - m_name: 0195.png
+    m_size: 2796340
+  - m_name: 0196.png
+    m_size: 2794158
+  - m_name: 0197.png
+    m_size: 2795757
+  - m_name: 0198.png
+    m_size: 2794844
+  - m_name: 0199.png
+    m_size: 2793790
+  - m_name: 0200.png
+    m_size: 2793189
+  - m_name: 0201.png
+    m_size: 2793812
+  - m_name: 0202.png
+    m_size: 2794605
+  - m_name: 0203.png
+    m_size: 2795808
+  - m_name: 0204.png
+    m_size: 2793309
+  - m_name: 0205.png
+    m_size: 2792912
+  - m_name: 0206.png
+    m_size: 2792736
+  - m_name: 0207.png
+    m_size: 2794245
+  - m_name: 0208.png
+    m_size: 2790923
+  - m_name: 0209.png
+    m_size: 2793288
+  - m_name: 0210.png
+    m_size: 2792176
+  - m_name: 0211.png
+    m_size: 2794064
+  - m_name: 0212.png
+    m_size: 2795035
+  - m_name: 0213.png
+    m_size: 2794894
+  - m_name: 0214.png
+    m_size: 2794534
+  - m_name: 0215.png
+    m_size: 2793849
+  - m_name: 0216.png
+    m_size: 2793936
+  - m_name: 0217.png
+    m_size: 2794970
+  - m_name: 0218.png
+    m_size: 2793335
+  - m_name: 0219.png
+    m_size: 2795349
+  - m_name: 0220.png
+    m_size: 2791348
+  - m_name: 0221.png
+    m_size: 2790356
+  - m_name: 0222.png
+    m_size: 2790515
+  - m_name: 0223.png
+    m_size: 2791465
+  - m_name: 0224.png
+    m_size: 2795069
+  - m_name: 0225.png
+    m_size: 2790765
+  - m_name: 0226.png
+    m_size: 2791033
+  - m_name: 0227.png
+    m_size: 2792463
+  - m_name: 0228.png
+    m_size: 2793285
+  - m_name: 0229.png
+    m_size: 2794142
+  - m_name: 0230.png
+    m_size: 2793035
+  - m_name: 0231.png
+    m_size: 2793565
+  - m_name: 0232.png
+    m_size: 2792470
+  - m_name: 0233.png
+    m_size: 2793701
+  - m_name: 0234.png
+    m_size: 2793890
+  - m_name: 0235.png
+    m_size: 2793902
+  - m_name: 0236.png
+    m_size: 2795479
+  - m_name: 0237.png
+    m_size: 2793377
+  - m_name: 0238.png
+    m_size: 2794532
+  - m_name: 0239.png
+    m_size: 2795203
+  - m_name: 0240.png
+    m_size: 2795468
+  - m_name: 0241.png
+    m_size: 2795595
+  - m_name: 0242.png
+    m_size: 2794541
+  - m_name: 0243.png
+    m_size: 2796134
+  - m_name: 0244.png
+    m_size: 2795165
+  - m_name: 0245.png
+    m_size: 2794452
+  - m_name: 0246.png
+    m_size: 2795820
+  - m_name: 0247.png
+    m_size: 2796932
+  - m_name: 0248.png
+    m_size: 2798685
+  - m_name: 0249.png
+    m_size: 2797377
+  - m_name: 0250.png
+    m_size: 2799313
+  - m_name: 0251.png
+    m_size: 2797464
+  - m_name: 0252.png
+    m_size: 2796792
+  - m_name: 0253.png
+    m_size: 2796554
+  - m_name: 0254.png
+    m_size: 2797829
+  - m_name: 0255.png
+    m_size: 2798867
+  - m_name: 0256.png
+    m_size: 2799103
+  - m_name: 0257.png
+    m_size: 2800884
+  - m_name: 0258.png
+    m_size: 2800145
+  - m_name: 0259.png
+    m_size: 2800731
+  - m_name: 0260.png
+    m_size: 2798685
+  - m_name: 0261.png
+    m_size: 2799858
+  - m_name: 0262.png
+    m_size: 2798790
+  - m_name: 0263.png
+    m_size: 2801028
+  - m_name: 0264.png
+    m_size: 2799793
+  - m_name: 0265.png
+    m_size: 2798059
+  - m_name: 0266.png
+    m_size: 2802263
+  - m_name: 0267.png
+    m_size: 2802479
+  - m_name: 0268.png
+    m_size: 2801980
+  - m_name: 0269.png
+    m_size: 2801942
+  - m_name: 0270.png
+    m_size: 2802259
+  - m_name: 0271.png
+    m_size: 2802300
+  - m_name: 0272.png
+    m_size: 2802763
+  - m_name: 0273.png
+    m_size: 2803320
+  - m_name: 0274.png
+    m_size: 2805641
+  - m_name: 0275.png
+    m_size: 2805145
+  - m_name: 0276.png
+    m_size: 2807271
+  - m_name: 0277.png
+    m_size: 2807945
+  - m_name: 0278.png
+    m_size: 2805603
+  - m_name: 0279.png
+    m_size: 2805023
+  - m_name: 0280.png
+    m_size: 2805904
+  - m_name: 0281.png
+    m_size: 2804790
+  - m_name: 0282.png
+    m_size: 2803015
+  - m_name: 0283.png
+    m_size: 2803558
+  - m_name: 0284.png
+    m_size: 2806940
+  - m_name: 0285.png
+    m_size: 2806134
+  - m_name: 0286.png
+    m_size: 2805566
+  - m_name: 0287.png
+    m_size: 2806101
+  - m_name: 0288.png
+    m_size: 2807520
+  - m_name: 0289.png
+    m_size: 2808146
+  - m_name: 0290.png
+    m_size: 2808348
+  - m_name: 0291.png
+    m_size: 2806858
+  - m_name: 0292.png
+    m_size: 2808786
+  - m_name: 0293.png
+    m_size: 2808118
+  - m_name: 0294.png
+    m_size: 2807617
+  - m_name: 0295.png
+    m_size: 2809051
+  - m_name: 0296.png
+    m_size: 2808423
+  - m_name: 0297.png
+    m_size: 2809782
+  - m_name: 0298.png
+    m_size: 2809478
+  - m_name: 0299.png
+    m_size: 2808456
+  - m_name: 0300.png
+    m_size: 2808547
+  - m_name: 0301.png
+    m_size: 2808788
+  - m_name: 0302.png
+    m_size: 2810091
+  - m_name: 0303.png
+    m_size: 2809159
+  - m_name: 0304.png
+    m_size: 2809260
+  - m_name: 0305.png
+    m_size: 2811559
+  - m_name: 0306.png
+    m_size: 2810160
+  - m_name: 0307.png
+    m_size: 2808757
+  - m_name: 0308.png
+    m_size: 2809122
+  - m_name: 0309.png
+    m_size: 2810302
+  - m_name: 0310.png
+    m_size: 2810179
+  - m_name: 0311.png
+    m_size: 2811903
+  - m_name: 0312.png
+    m_size: 2809376
+  - m_name: 0313.png
+    m_size: 2809133
+  - m_name: 0314.png
+    m_size: 2811196
+  - m_name: 0315.png
+    m_size: 2809631
+  - m_name: 0316.png
+    m_size: 2810945
+  - m_name: 0317.png
+    m_size: 2810233
+  - m_name: 0318.png
+    m_size: 2810195
+  - m_name: 0319.png
+    m_size: 2810955
+  - m_name: 0320.png
+    m_size: 2807238
+  - m_name: 0321.png
+    m_size: 2808203
+  - m_name: 0322.png
+    m_size: 2809574
+  - m_name: 0323.png
+    m_size: 2811887
+  - m_name: 0324.png
+    m_size: 2809300
+  - m_name: 0325.png
+    m_size: 2811056
+  - m_name: 0326.png
+    m_size: 2811970
+  - m_name: 0327.png
+    m_size: 2811755
+  - m_name: 0328.png
+    m_size: 2811281
+  - m_name: 0329.png
+    m_size: 2810404
+  - m_name: 0330.png
+    m_size: 2812191
+  - m_name: 0331.png
+    m_size: 2811323
+  - m_name: 0332.png
+    m_size: 2810702
+  - m_name: 0333.png
+    m_size: 2810856
+  - m_name: 0334.png
+    m_size: 2808761
+  - m_name: 0335.png
+    m_size: 2808790
+  - m_name: 0336.png
+    m_size: 2808889
+  - m_name: 0337.png
+    m_size: 2808860
+  - m_name: 0338.png
+    m_size: 2808429
+  - m_name: 0339.png
+    m_size: 2809343
+  - m_name: 0340.png
+    m_size: 2807622
+  - m_name: 0341.png
+    m_size: 2807618
+  - m_name: 0342.png
+    m_size: 2810107
+  - m_name: 0343.png
+    m_size: 2809334
+  - m_name: 0344.png
+    m_size: 2809600
+  - m_name: 0345.png
+    m_size: 2807486
+  - m_name: 0346.png
+    m_size: 2809140
+  - m_name: 0347.png
+    m_size: 2809001
+  - m_name: 0348.png
+    m_size: 2808355
+  - m_name: 0349.png
+    m_size: 2810139
+  - m_name: 0350.png
+    m_size: 2807702
+  - m_name: 0351.png
+    m_size: 2809133
+  - m_name: 0352.png
+    m_size: 2808563
+  - m_name: 0353.png
+    m_size: 2808608
+  - m_name: 0354.png
+    m_size: 2805688
+  - m_name: 0355.png
+    m_size: 2805564
+  - m_name: 0356.png
+    m_size: 2803360
+  - m_name: 0357.png
+    m_size: 2803883
+  - m_name: 0358.png
+    m_size: 2798594
+  - m_name: 0359.png
+    m_size: 2800308
+  - m_name: 0360.png
+    m_size: 2798472
+  - m_name: 0361.png
+    m_size: 2799026
+  - m_name: 0362.png
+    m_size: 2797399
+  - m_name: 0363.png
+    m_size: 2795195
+  - m_name: 0364.png
+    m_size: 2795487
+  - m_name: 0365.png
+    m_size: 2795815
+  - m_name: 0366.png
+    m_size: 2793033
+  - m_name: 0367.png
+    m_size: 2795111
+  - m_name: 0368.png
+    m_size: 2791711
+  - m_name: 0369.png
+    m_size: 2790010
+  - m_name: 0370.png
+    m_size: 2788617
+  - m_name: 0371.png
+    m_size: 2788119
+  - m_name: 0372.png
+    m_size: 2787045
+  - m_name: 0373.png
+    m_size: 2784855
+  - m_name: 0374.png
+    m_size: 2783288
+  - m_name: 0375.png
+    m_size: 2782852
+  - m_name: 0376.png
+    m_size: 2782367
+  - m_name: 0377.png
+    m_size: 2781374
+  - m_name: 0378.png
+    m_size: 2781817
+  - m_name: 0379.png
+    m_size: 2781470
+  - m_name: 0380.png
+    m_size: 2781695
+  - m_name: 0381.png
+    m_size: 2780606
+  - m_name: 0382.png
+    m_size: 2779877
+  - m_name: 0383.png
+    m_size: 2782103
+  - m_name: 0384.png
+    m_size: 2784395
+  - m_name: 0385.png
+    m_size: 2784783
+  - m_name: 0386.png
+    m_size: 2786454
+  - m_name: 0387.png
+    m_size: 2787600
+  - m_name: 0388.png
+    m_size: 2789873
+  - m_name: 0389.png
+    m_size: 2790639
+  - m_name: 0390.png
+    m_size: 2793295
+  - m_name: 0391.png
+    m_size: 2794135
+  - m_name: 0392.png
+    m_size: 2792615
+  - m_name: 0393.png
+    m_size: 2793316
+  - m_name: 0394.png
+    m_size: 2796621
+  - m_name: 0395.png
+    m_size: 2796249
+  - m_name: 0396.png
+    m_size: 2795814
+  - m_name: 0397.png
+    m_size: 2799338
+  - m_name: 0398.png
+    m_size: 2796307
+  - m_name: 0399.png
+    m_size: 2796924
+  - m_name: 0400.png
+    m_size: 2792086
+  - m_name: 0401.png
+    m_size: 2794413
+  - m_name: 0402.png
+    m_size: 2791127
+  - m_name: 0403.png
+    m_size: 2789985
+  - m_name: 0404.png
+    m_size: 2787935
+  - m_name: 0405.png
+    m_size: 2787627
+  - m_name: 0406.png
+    m_size: 2785475
+  - m_name: 0407.png
+    m_size: 2782749
+  - m_name: 0408.png
+    m_size: 2781561
+  - m_name: 0409.png
+    m_size: 2783862
+  - m_name: 0410.png
+    m_size: 2781147
+  - m_name: 0411.png
+    m_size: 2781021
+  - m_name: 0412.png
+    m_size: 2782395
+  - m_name: 0413.png
+    m_size: 2781421
+  - m_name: 0414.png
+    m_size: 2779564
+  - m_name: 0415.png
+    m_size: 2778429
+  - m_name: 0416.png
+    m_size: 2780683
+  - m_name: 0417.png
+    m_size: 2781385
+  - m_name: 0418.png
+    m_size: 2779640
+  - m_name: 0419.png
+    m_size: 2780619
+  - m_name: 0420.png
+    m_size: 2778660
+  - m_name: 0421.png
+    m_size: 2780270
+  - m_name: 0422.png
+    m_size: 2779177
+  - m_name: 0423.png
+    m_size: 2779036
+  - m_name: 0424.png
+    m_size: 2778813
+  - m_name: 0425.png
+    m_size: 2779161
+  - m_name: 0426.png
+    m_size: 2778958
+  - m_name: 0427.png
+    m_size: 2777654
+  - m_name: 0428.png
+    m_size: 2777414
+  - m_name: 0429.png
+    m_size: 2776959
+  m_timelineBGColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_version: 3
+  m_time: 0
+  m_textureFilterMode: 1
+  Folder: 
+  m_timelineDefaultAsset: {fileID: 102900000, guid: 5f13aa550ce777548ade55f97e7da467, type: 3}
