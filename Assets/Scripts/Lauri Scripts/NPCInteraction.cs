@@ -28,6 +28,7 @@ public class NPCInteraction : MonoBehaviour
     private PlayerMovement playerMovement;
     private float originalMoveSpeed;
     private float originalJumpForce;
+    private QuestPanelAnimator questPanelAnimator;
 
     void Start()
     {
@@ -39,6 +40,10 @@ public class NPCInteraction : MonoBehaviour
         if (screenSpaceDialogue != null)
         {
             screenSpaceDialogue.HideDialogue();
+        }
+        if (questUI != null)
+        {
+            questPanelAnimator = questUI.GetComponent<QuestPanelAnimator>();
         }
     }
 
@@ -170,7 +175,10 @@ public class NPCInteraction : MonoBehaviour
         if (questUI != null && questText != null)
         {
             questUI.SetActive(true);
-            questText.text = questDescription;
+            if (questPanelAnimator != null)
+                questPanelAnimator.PlayOpenAnimation(questDescription);
+            else
+                questText.text = questDescription;
         }
     }
 
@@ -201,6 +209,11 @@ public class NPCInteraction : MonoBehaviour
         }
 
         questText.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
-        questUI.SetActive(false);
+
+        // Start the shrink animation after fading out the text
+        if (questPanelAnimator != null)
+            yield return questPanelAnimator.PlayShrinkAnimation();
+
+        //questUI.SetActive(false);
     }
 }
