@@ -27285,7 +27285,7 @@ PrefabInstance:
     - target: {fileID: 5969351876329562693, guid: ae544df372441b041a037cd5f461e141, type: 3}
       propertyPath: m_text
       value: "\n       HOW TO PLAY         \n                           \nMove:       
-        A / D or \u2190 \u2192   \nJump:        Space or W          \nAttack:      
+        A / D  \u2190 \u2192   \nJump:        Space or W          \nAttack:      
         Mouse left click  \nInteract:       E \nPause:       Tab            \n                            
         \n Press any key to continue \n"
       objectReference: {fileID: 0}
