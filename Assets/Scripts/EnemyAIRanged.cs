@@ -66,6 +66,7 @@ public class EnemyAIRanged : MonoBehaviour
                 {
                     StartCoroutine(PerformAttack());
                 }
+                agent.ResetPath();
             }
             else if (distanceToPlayer <= runAwayRange)
             {
@@ -73,6 +74,7 @@ public class EnemyAIRanged : MonoBehaviour
             }
             else if (distanceToPlayer <= throwProjectileRange)
             {
+                agent.ResetPath();
                 ThrowProjectile();
             }
             else
@@ -162,6 +164,30 @@ public class EnemyAIRanged : MonoBehaviour
         if (projectile != null) Destroy(projectile);
     }
 
+    private IEnumerator PerformAttack()
+    {
+        isAttacking = true;
+        nextComboTime = Time.time + Random.Range(attackCooldownMin, attackCooldownMax);
+
+        yield return new WaitForSeconds(0.5f); // simulate wind-up
+
+        if (player != null && Vector3.Distance(transform.position, player.transform.position) <= attackRange)
+        {
+            PlayerHealth health = player.GetComponent<PlayerHealth>();
+            if (health != null) health.TakeDamage(attackDamage);
+
+            Rigidbody playerRb = player.GetComponent<Rigidbody>();
+            if (playerRb != null)
+            {
+                Vector3 knockbackDir = (player.transform.position - transform.position).normalized;
+                playerRb.AddForce(knockbackDir * knockbackForce, ForceMode.Impulse);
+            }
+        }
+
+        yield return new WaitForSeconds(0.3f); // simulate attack recovery
+        isAttacking = false;
+    }
+
     private IEnumerator RandomBehavior()
     {
         while (!isChasing && !isSearching)
@@ -191,79 +217,14 @@ public class EnemyAIRanged : MonoBehaviour
 
     private IEnumerator IdleAnimation()
     {
-        float tiltAmount = 10f;
-        float tiltSpeed = 2f;
-        float timeElapsed = 0f;
-
-        while (timeElapsed < patrolTime)
-        {
-            float angle = Mathf.Sin(Time.time * tiltSpeed) * tiltAmount;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.rotation = Quaternion.identity;
-    }
-
-    private IEnumerator PerformAttack()
-    {
-        isAttacking = true;
-        int comboCount = Random.Range(1, 4);
-
-        for (int i = 0; i < comboCount; i++)
-        {
-            int attackType = Random.Range(0, 3);
-
-            if (attackType == 0) transform.rotation = Quaternion.Euler(0, 0, 10);
-            else if (attackType == 1) transform.rotation = Quaternion.Euler(0, 0, -10);
-            else transform.rotation = Quaternion.Euler(50, 0, -50);
-
-            if (Vector3.Distance(transform.position, player.transform.position) < 2f)
-            {
-                PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-                if (playerHealth != null) playerHealth.TakeDamage(attackDamage);
-
-                Rigidbody playerRb = player.GetComponent<Rigidbody>();
-                if (playerRb != null)
-                {
-                    Vector3 knockbackDir = (player.transform.position - transform.position).normalized;
-                    playerRb.AddForce(knockbackDir * knockbackForce, ForceMode.Impulse);
-                }
-            }
-
-            yield return new WaitForSeconds(0.4f);
-        }
-
-        transform.rotation = Quaternion.identity;
-        nextComboTime = Time.time + Random.Range(attackCooldownMin, attackCooldownMax);
-        isAttacking = false;
+        yield return new WaitForSeconds(Random.Range(1f, patrolTime));
     }
 
     private IEnumerator HandleJump()
     {
         isJumping = true;
-        agent.isStopped = true;
-
-        OffMeshLinkData linkData = agent.currentOffMeshLinkData;
-        Vector3 startPos = agent.transform.position;
-        Vector3 endPos = linkData.endPos + Vector3.up * agent.baseOffset;
-
-        float jumpDuration = 0.5f;
-        float elapsedTime = 0f;
-
-        while (elapsedTime < jumpDuration)
-        {
-            float t = elapsedTime / jumpDuration;
-            float height = 2f * Mathf.Sin(Mathf.PI * t); // jump arc
-
-            agent.transform.position = Vector3.Lerp(startPos, endPos, t) + Vector3.up * height;
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
+        yield return new WaitForSeconds(0.3f);
         agent.CompleteOffMeshLink();
-        agent.isStopped = false;
         isJumping = false;
     }
 }

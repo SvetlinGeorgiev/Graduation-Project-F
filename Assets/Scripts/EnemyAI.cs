@@ -27,6 +27,9 @@ public class EnemyAI : MonoBehaviour
     private Vector3 lastSeenPlayerPosition;
     private float searchTimer = 0f;
     private float nextComboTime = 0f;
+    public float jumpDuration = 0.5f;
+public float jumpCooldown = 0.3f; // ⬅️ Added small delay after jump
+
 
     private void Start()
     {
@@ -41,16 +44,17 @@ public class EnemyAI : MonoBehaviour
         StartCoroutine(RandomBehavior());
     }
 
-    private void Update()
+private void Update()
 {
     Vector3 position = transform.position;
     transform.position = new Vector3(position.x, position.y, -16.43f);
 
-    if (player == null) return;
+    if (player == null || isJumping) return; // 🚫 Skip everything if jumping
 
     if (agent.isOnOffMeshLink && !isAttacking && !isJumping)
     {
         StartCoroutine(TraverseNavMeshLink());
+        return;
     }
 
     if (CanSeePlayer())
@@ -98,11 +102,14 @@ public class EnemyAI : MonoBehaviour
 }
 
 
+
     private bool CanSeePlayer()
-    {
-        float distance = Vector3.Distance(transform.position, player.transform.position);
-        return distance <= detectionRange;
-    }
+{
+    if (isJumping) return false; // Don't detect player while jumping
+    float distance = Vector3.Distance(transform.position, player.transform.position);
+    return distance <= detectionRange;
+}
+
 
     private IEnumerator RandomBehavior()
     {
@@ -194,30 +201,34 @@ public class EnemyAI : MonoBehaviour
     }
 
     private IEnumerator TraverseNavMeshLink()
+{
+    isJumping = true;
+    agent.isStopped = true;
+
+    OffMeshLinkData data = agent.currentOffMeshLinkData;
+    Vector3 startPos = agent.transform.position;
+    Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
+
+    float jumpDuration = 0.5f;
+    float timeElapsed = 0f;
+
+    while (timeElapsed < jumpDuration)
     {
-        isJumping = true;
-        agent.isStopped = true;
+        float t = timeElapsed / jumpDuration;
+        float height = 2f * Mathf.Sin(Mathf.PI * t); // Parabola arc
+        agent.transform.position = Vector3.Lerp(startPos, endPos, t) + Vector3.up * height;
 
-        OffMeshLinkData data = agent.currentOffMeshLinkData;
-        Vector3 startPos = transform.position;
-        Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-
-        float duration = 0.4f;
-        float time = 0f;
-
-        while (time < duration)
-        {
-            float t = time / duration;
-            transform.position = Vector3.Lerp(startPos, endPos, t) + Vector3.up * Mathf.Sin(t * Mathf.PI) * 1.5f;
-            time += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.position = endPos;
-        agent.CompleteOffMeshLink();
-        agent.isStopped = false;
-        isJumping = false;
+        timeElapsed += Time.deltaTime;
+        yield return null;
     }
+
+    agent.CompleteOffMeshLink();
+    agent.transform.position = endPos;
+
+    isJumping = false;
+    agent.isStopped = false;
+}
+
 
 
     private void DashTowardsPlayer()

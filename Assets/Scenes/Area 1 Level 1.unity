@@ -38659,6 +38659,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RangedEnemy
       objectReference: {fileID: 0}
+    - target: {fileID: 1857354607722566889, guid: 3d426393ca360fc4ca68f64f20a25b48, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2810806894119744687, guid: 3d426393ca360fc4ca68f64f20a25b48, type: 3}
       propertyPath: m_UseGravity
       value: 0
@@ -106618,11 +106622,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 542600914253927213, guid: a548eb412b422ad4e83da692bbaa9869, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5025425190558341308, guid: a548eb412b422ad4e83da692bbaa9869, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 28.87
+      value: 21.23
       objectReference: {fileID: 0}
     - target: {fileID: 5025425190558341308, guid: a548eb412b422ad4e83da692bbaa9869, type: 3}
       propertyPath: m_LocalPosition.y
