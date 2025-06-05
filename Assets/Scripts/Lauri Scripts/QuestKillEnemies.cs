@@ -1,43 +1,76 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class QuestKillEnemies : MonoBehaviour
 {
     public int killTarget = 5;
     private int currentKills = 0;
     public bool questCompleted = false;
+    public bool questActive = false;
 
-    [Header("Enemy to Track")]
-    public GameObject enemyPrefab; // Assign the enemy prefab/type to track in Inspector
+    [Header("Enemy Tag to Track")]
+    public string enemyTag = "Enemy";
+
+    [Header("Quest Banner Animation")]
+    public QuestPanelAnimator questPanelAnimator; // Assign in Inspector
+
+    // Call this from your NPC or quest-giver to start the quest
+    public void StartQuest()
+    {
+        questActive = true;
+        questCompleted = false;
+        currentKills = 0;
+        // Optionally, show the quest banner here
+        if (questPanelAnimator != null)
+        {
+            questPanelAnimator.ResetPanel();
+            questPanelAnimator.PlayOpenAnimation($"Defeat {killTarget} enemies: {currentKills}/{killTarget}");
+        }
+    }
 
     // Call this method from your enemy script when an enemy dies
     public void RegisterEnemyKill(GameObject killedEnemy)
     {
-        // Only count kills if the killed enemy matches the tracked prefab (by comparing prefab or tag)
-        if (questCompleted) return;
-        if (enemyPrefab != null && killedEnemy != null)
+        if (!questActive || questCompleted) return;
+        if (killedEnemy != null && killedEnemy.CompareTag(enemyTag))
         {
-            // Compare by prefab (if using prefab variants, consider using tags or a scriptable object ID)
-            if (killedEnemy.name.Contains(enemyPrefab.name))
-            {
-                currentKills++;
-            }
-            else
-            {
-                return;
-            }
+            currentKills++;
+        }
+        else if (string.IsNullOrEmpty(enemyTag))
+        {
+            currentKills++;
         }
         else
         {
-            // If no prefab assigned, count all kills
-            currentKills++;
+            return;
+        }
+
+        // Optionally, update the quest banner text
+        if (questPanelAnimator != null)
+        {
+            questPanelAnimator.questText.text = $"Defeat {killTarget} enemies: {currentKills}/{killTarget}";
         }
 
         if (currentKills >= killTarget)
         {
             questCompleted = true;
-            // Optionally, trigger quest completion logic here (e.g., notify NPCInteraction)
+            questActive = false;
+            if (questPanelAnimator != null)
+            {
+                questPanelAnimator.questText.text = "Quest Completed!";
+                // Start the shrink/fade animation after a short delay
+                questPanelAnimator.StartCoroutine(FadeAndShrinkBanner());
+            }
+            Debug.Log("Quest completed! Killed " + currentKills + " enemies.");
         }
+    }
+
+    private IEnumerator FadeAndShrinkBanner()
+    {
+        yield return new WaitForSeconds(2f); // Wait before starting fade/shrink
+        if (questPanelAnimator != null)
+            yield return questPanelAnimator.PlayShrinkAnimation();
     }
 
     public int GetCurrentKills() => currentKills;

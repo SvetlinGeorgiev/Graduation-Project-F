@@ -24,6 +24,11 @@ public class EnemyHealth : MonoBehaviour
     private void Die()
     {
         Debug.Log(gameObject.name + " has died!");
+        QuestKillEnemies quest = FindObjectOfType<QuestKillEnemies>();
+        if (quest != null)
+        {
+            quest.RegisterEnemyKill(gameObject);
+        }
         Destroy(gameObject); 
     }
 }

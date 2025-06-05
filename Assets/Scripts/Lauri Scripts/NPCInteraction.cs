@@ -24,6 +24,7 @@ public class NPCInteraction : MonoBehaviour
 
     public enum DialogueMode { WorldSpace, ScreenSpace }
     public DialogueMode dialogueMode = DialogueMode.WorldSpace;
+    public QuestKillEnemies killEnemiesQuest;
 
     private PlayerMovement playerMovement;
     private float originalMoveSpeed;
@@ -179,6 +180,14 @@ public class NPCInteraction : MonoBehaviour
                 questPanelAnimator.PlayOpenAnimation(questDescription);
             else
                 questText.text = questDescription;
+
+            // Start the kill enemies quest if assigned to this NPC
+            if (killEnemiesQuest != null)
+                killEnemiesQuest.StartQuest();
+
+            // If you have other quest types, call their StartQuest() here
+            // if (fetchItemQuest != null)
+            //     fetchItemQuest.StartQuest();
         }
     }
 
