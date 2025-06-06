@@ -12,12 +12,14 @@ public class SpikeTrap : MonoBehaviour
     private Vector3 startPos;
     private Vector3 endPos;
     private bool isUp = false;
+    private float initialY;
 
     private void Start()
     {
-        startPos = new Vector3(transform.position.x, downPosition, transform.position.z);
-        endPos = new Vector3(transform.position.x, upPosition, transform.position.z);
-        transform.position = startPos; 
+        initialY = transform.position.y;
+        startPos = new Vector3(transform.position.x, initialY + downPosition, transform.position.z);
+        endPos = new Vector3(transform.position.x, initialY + upPosition, transform.position.z);
+        transform.position = startPos;
         StartCoroutine(SpikeCycle());
     }
 

@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8826622286520159774
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 328.586
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.917872
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -20.340494
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.03568605
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.0002355999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.99934125
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.006605513
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0.755
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 184.091
+      objectReference: {fileID: 0}
+    - target: {fileID: 4027690475960898834, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0.054
+      objectReference: {fileID: 0}
+    - target: {fileID: 4372691263719198632, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_Name
+      value: Main Rock 12 (87) Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 4372691263719198632, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      propertyPath: m_TagString
+      value: Ground
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4372691263719198632, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8422669830745236800}
+    - targetCorrespondingSourceObject: {fileID: 4372691263719198632, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6304843411264362183}
+  m_SourcePrefab: {fileID: 100100000, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+--- !u!1 &5102751813639815606 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4372691263719198632, guid: f6433a473e5b8bc4ca546bb6312cb939, type: 3}
+  m_PrefabInstance: {fileID: 8826622286520159774}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &8422669830745236800
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5102751813639815606}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 9.496807, y: 8.917048, z: 8.98322}
+  m_Center: {x: 0.004658702, y: -1.3968197, z: 0.00038623277}
+--- !u!114 &6304843411264362183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5102751813639815606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29e62a3ca03f9c4478a40f14bba1e897, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disappearDelay: 1
+  reappearDelay: 3
+  colorChangeDuration: 0.5
