@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
@@ -9,40 +10,45 @@ public class EnemyAI : MonoBehaviour
     public float attackRange = 1.8f;
     public float dashForce = 10f;
     public float attackCooldown = 2f;
-    public float patrolTime = 2f;
+    public float patrolTime = 1f;
     public float chaseLostDuration = 5f;
 
-    public Transform edgeCheck, edgeCheckLeft;
-    public Transform upperPlatformCheck, upperPlatformCheckLeft;
-    public Transform lowerPlatformCheck, lowerPlatformCheckLeft;
     public Transform groundCheck;
     public LayerMask groundLayer;
     public int attackDamage = 20;
-    public float attackCooldownMin = 1f; 
-    public float attackCooldownMax = 3f; 
-
+    public float attackCooldownMin = 1f;
+    public float attackCooldownMax = 3f;
+    public float knockbackForce = 5f;
 
     private Rigidbody rb;
+    private NavMeshAgent agent;
+    private AgentLinkMover linkMover;
     private bool isGrounded;
     private bool isChasing = false;
     private bool isIdle = false;
     private bool isSearching = false;
     private bool isAttacking = false;
+
     private float searchTimer = 0f;
-    private float lastAttackTime = 0f;
-    public float knockbackForce = 5f;
-    private float attackCooldownTimer = 0f;
     private float nextComboTime = 0f;
-
-
-
-    private Vector3 movementDirection;
     private Vector3 lastSeenPlayerPosition;
     private GameObject player;
+
+    private Vector3 patrolDestination;
+    private bool hasPatrolDestination = false;
+    private bool wasMovingToPatrol = false;
+    private float patrolDistanceMin = 2f;
+    private float patrolDistanceMax = 15f;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
+        linkMover = GetComponent<AgentLinkMover>();
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
+        agent.speed = moveSpeed;
+
         player = GameObject.FindGameObjectWithTag("Player");
         StartCoroutine(RandomBehavior());
     }
@@ -50,6 +56,17 @@ public class EnemyAI : MonoBehaviour
     private void FixedUpdate()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundLayer);
+
+        if (linkMover != null && linkMover.IsTraversing)
+        {
+            agent.ResetPath();
+            return;
+        }
+
+        if (agent.isOnOffMeshLink)
+        {
+            return;
+        }
 
         if (CanSeePlayer())
         {
@@ -66,6 +83,7 @@ public class EnemyAI : MonoBehaviour
                 {
                     StartCoroutine(PerformAttack());
                 }
+                agent.ResetPath();
             }
             else
             {
@@ -94,12 +112,13 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        if (!isChasing && !isSearching && !isIdle)
+        if (!isChasing && !isSearching && !isIdle && !agent.isOnOffMeshLink && (linkMover == null || !linkMover.IsTraversing))
         {
             Patrol();
         }
-
-        CheckForPlatformsAndEdges();
+        Vector3 fixedPosition = transform.position;
+        fixedPosition.z = -16.4f;
+        transform.position = fixedPosition;
     }
 
     private bool CanSeePlayer()
@@ -111,23 +130,62 @@ public class EnemyAI : MonoBehaviour
 
     private void Patrol()
     {
-        rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        if ((linkMover != null && linkMover.IsTraversing) || agent.isOnOffMeshLink)
+            return;
+
+        if (!hasPatrolDestination && !agent.pathPending && !agent.hasPath)
+        {
+            float patrolDistance = Random.Range(patrolDistanceMin, patrolDistanceMax);
+
+            Vector3 horizontalDir = Random.value > 0.5f ? Vector3.right : Vector3.left;
+
+            Vector3 verticalDir = Random.value > 0.8f ? Vector3.down : Vector3.zero;
+
+            Vector3 direction = (horizontalDir + verticalDir).normalized;
+
+            Vector3 targetPos = transform.position + direction * patrolDistance;
+
+            RaycastHit hitInfo;
+            if (Physics.Raycast(targetPos + Vector3.up * 5f, Vector3.down, out hitInfo, 10f, groundLayer))
+            {
+                targetPos.y = hitInfo.point.y + 0.1f; 
+            }
+
+            NavMeshHit navHit;
+           
+            if (NavMesh.SamplePosition(targetPos, out navHit, 7f, NavMesh.AllAreas))
+            {
+                patrolDestination = navHit.position;
+                if (agent.SetDestination(patrolDestination))
+                {
+                    hasPatrolDestination = true;
+                    wasMovingToPatrol = true;
+
+                    Debug.DrawLine(transform.position, patrolDestination, Color.green, 2f);
+                    Debug.Log($"Patrolling to {patrolDestination}");
+                }
+            }
+        }
+
+        if (hasPatrolDestination && !agent.pathPending)
+        {
+            if (agent.remainingDistance <= agent.stoppingDistance + 0.1f && agent.velocity.sqrMagnitude < 0.01f)
+            {
+                hasPatrolDestination = false;
+                wasMovingToPatrol = false;
+            }
+        }
     }
 
     private void ChasePlayer()
     {
         if (player == null) return;
-
-        Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-        movementDirection = new Vector3(Mathf.Sign(directionToPlayer.x), 0, 0);
-        rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        agent.SetDestination(player.transform.position);
     }
 
     private void MoveToLastSeenDirection()
     {
-        Vector3 direction = (lastSeenPlayerPosition - transform.position).normalized;
-        movementDirection = new Vector3(Mathf.Sign(direction.x), 0, 0);
-        rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        agent.SetDestination(lastSeenPlayerPosition);
     }
 
     private IEnumerator RandomBehavior()
@@ -140,65 +198,27 @@ public class EnemyAI : MonoBehaviour
             if (isIdle)
             {
                 StartCoroutine(IdleAnimation());
+
+                if (agent.hasPath)
+                {
+                    agent.ResetPath();
+                    hasPatrolDestination = false;
+                    wasMovingToPatrol = false;
+                }
             }
             else
             {
-                movementDirection = (Random.value > 0.5f) ? Vector3.right : Vector3.left;
+                if (!hasPatrolDestination)
+                {
+                    agent.ResetPath();
+                }
+
+                hasPatrolDestination = false;
+                wasMovingToPatrol = false;
             }
 
             yield return new WaitForSeconds(waitTime);
         }
-    }
-
-    private void CheckForPlatformsAndEdges()
-    {
-        bool movingRight = movementDirection.x > 0;
-
-        Transform edgeCheckPos = movingRight ? edgeCheck : edgeCheckLeft;
-        Transform upperCheckPos = movingRight ? upperPlatformCheck : upperPlatformCheckLeft;
-        Transform lowerCheckPos = movingRight ? lowerPlatformCheck : lowerPlatformCheckLeft;
-
-        bool edgeDetected = !Physics.Raycast(edgeCheckPos.position, Vector3.down, 1f, groundLayer);
-
-        RaycastHit upperHit;
-        Vector3 rayDirection = (upperCheckPos.position - edgeCheckPos.position).normalized;
-        float rayDistance = Vector3.Distance(edgeCheckPos.position, upperCheckPos.position);
-        bool upperPlatformDetected = Physics.Raycast(edgeCheckPos.position, rayDirection, out upperHit, rayDistance, groundLayer);
-
-        RaycastHit lowerHit;
-        bool lowerPlatformDetected = Physics.Raycast(lowerCheckPos.position, movementDirection, out lowerHit, 1.5f, groundLayer);
-
-        RaycastHit headHit;
-        bool headBlocked = Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.up, out headHit, upperCheckPos.position.y - (transform.position.y + 0.5f), groundLayer);
-
-        if (upperPlatformDetected && isGrounded && !headBlocked)
-        {
-            float platformY = upperHit.point.y;
-            float enemyY = transform.position.y;
-
-            if (platformY > enemyY + 0.2f)
-            {
-                Jump();
-            }
-        }
-        else if (edgeDetected && lowerPlatformDetected && isGrounded)
-        {
-            StartCoroutine(DelayedJump());
-        }
-    }
-
-    private IEnumerator DelayedJump()
-    {
-        yield return new WaitForSeconds(0.2f);
-        if (isGrounded)
-        {
-            Jump();
-        }
-    }
-
-    private void Jump()
-    {
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, 0);
     }
 
     private IEnumerator IdleAnimation()
@@ -221,24 +241,18 @@ public class EnemyAI : MonoBehaviour
     private IEnumerator PerformAttack()
     {
         isAttacking = true;
-        int comboCount = Random.Range(1, 4); 
+        int comboCount = Random.Range(1, 4);
 
         for (int i = 0; i < comboCount; i++)
         {
-            int attackType = Random.Range(0, 3); 
+            int attackType = Random.Range(0, 3);
 
             if (attackType == 0)
-            {
-                transform.rotation = Quaternion.Euler(0, 0, 10); 
-            }
+                transform.rotation = Quaternion.Euler(0, 0, 10);
             else if (attackType == 1)
-            {
-                transform.rotation = Quaternion.Euler(0, 0, -10); 
-            }
-            else if (attackType == 2)
-            {
-                transform.rotation = Quaternion.Euler(50, 0, -50); 
-            }
+                transform.rotation = Quaternion.Euler(0, 0, -10);
+            else
+                transform.rotation = Quaternion.Euler(50, 0, -50);
 
             if (Vector3.Distance(transform.position, player.transform.position) < 2f)
             {
@@ -256,22 +270,16 @@ public class EnemyAI : MonoBehaviour
                 }
             }
 
-            yield return new WaitForSeconds(0.3f); 
-
-            
+            yield return new WaitForSeconds(0.3f);
             transform.rotation = Quaternion.identity;
-            yield return new WaitForSeconds(0.2f); 
+            yield return new WaitForSeconds(0.2f);
         }
 
-        
         float randomCooldown = Random.Range(attackCooldownMin, attackCooldownMax);
         yield return new WaitForSeconds(randomCooldown);
 
         isAttacking = false;
     }
-
-
-
 
     private void DashTowardsPlayer()
     {
