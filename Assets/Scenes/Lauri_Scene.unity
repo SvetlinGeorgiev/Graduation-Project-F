@@ -35484,6 +35484,10 @@ PrefabInstance:
       propertyPath: m_Interpolate
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9103349435705846395, guid: 84f2ec44aaef6434ba8c7fbf6900691b, type: 3}
+      propertyPath: healthBar
+      value: 
+      objectReference: {fileID: 1358641635}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
