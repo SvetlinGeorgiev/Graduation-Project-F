@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerHealth : MonoBehaviour
 {
     public int maxHealth = 100;
-    private int currentHealth;
+    public int currentHealth;
     public Slider healthBar; 
 
     private PlayerControls controls;
@@ -28,6 +28,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        Debug.Log(currentHealth);
         currentHealth -= damage;
         healthBar.value = currentHealth;
 
