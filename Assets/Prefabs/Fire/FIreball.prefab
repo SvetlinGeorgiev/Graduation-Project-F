@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 560914778127736011}
   - component: {fileID: 607032652712740546}
   - component: {fileID: -8692820135609950959}
-  - component: {fileID: 1515787382869517701}
   - component: {fileID: 4289360854176294742}
+  - component: {fileID: 650118789291476069}
   m_Layer: 0
   m_Name: FIreball
   m_TagString: Untagged
@@ -131,28 +131,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 15
   damage: 40
---- !u!64 &1515787382869517701
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3291355187799740401}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
 --- !u!54 &4289360854176294742
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -179,4 +157,25 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
+--- !u!135 &650118789291476069
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3291355187799740401}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 3.61
+  m_Center: {x: 0.48, y: 0, z: 0}

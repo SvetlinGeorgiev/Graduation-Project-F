@@ -35,6 +35,7 @@ public class Fireball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"Fireball hit: {other.name}"); // Add this line
         if (!initialized) return;
 
         if (other.CompareTag("Player"))
@@ -47,7 +48,7 @@ public class Fireball : MonoBehaviour
 
             Explode();
         }
-        else if (!other.CompareTag("Boss")) // Ignore boss itself
+        else if (!other.CompareTag("Enemy")) // Ignore boss itself
         {
             Explode();
         }

@@ -97,7 +97,6 @@ public class BossAI : MonoBehaviour
             return;
         }
 
-        // Handle retreat logic first and skip all other AI while retreating
         if (isRetreating)
         {
             HandleRetreat();
@@ -154,7 +153,6 @@ public class BossAI : MonoBehaviour
             }
         }
 
-        // Lock Z position (2.5D style)
         Vector3 fixedPos = transform.position;
         fixedPos.z = -16.4f;
         transform.position = fixedPos;
@@ -170,88 +168,89 @@ public class BossAI : MonoBehaviour
 
             int rand = Random.Range(1, 5);
 
-            if (rand == 1)
-            {
-                StartCoroutine(FireballSequence());
-            }
+            if (rand == 1 && (isChasing || isRetreating) && CanSeePlayer())
+{
+    StartCoroutine(FireballSequence());
+}
         }
     }
 
     private IEnumerator FireballSequence()
-{
-    isAttacking = false;
-    isRetreating = false;
-    agent.isStopped = true;
-    agent.ResetPath();
-    agent.enabled = false;
-
-    Vector3 dashDirection = (transform.position - player.transform.position).normalized;
-    dashDirection.y = 0;
-    dashDirection.z = 0;
-
-    float dashDuration = 0.3f;
-    float dashElapsed = 0f;
-
-    rb.isKinematic = false;
-
-    // Perform dash BEFORE declaring fireball active
-    while (dashElapsed < dashDuration)
     {
-        rb.linearVelocity = dashDirection * fireballDashSpeed;
-        dashElapsed += Time.deltaTime;
-        yield return null;
-    }
+        isAttacking = false;
+        isRetreating = false;
+        agent.isStopped = true;
+        agent.ResetPath();
+        agent.enabled = false;
 
-    rb.linearVelocity = Vector3.zero;
-    rb.isKinematic = true;
+        Vector3 dashDirection = (transform.position - player.transform.position).normalized;
+        dashDirection.y = 0;
+        dashDirection.z = 0;
 
-    // Now declare that we're actually in fireball state
-    isFireballActive = true;
+        float dashDuration = 0.3f;
+        float dashElapsed = 0f;
 
-    if (fireballCountdownTextPrefab != null)
-    {
-        Vector3 textPos = transform.position + new Vector3(0, 3f, 0);
-        fireballCountdownInstance = Instantiate(fireballCountdownTextPrefab, textPos, Quaternion.identity, transform);
-        fireballCountdownInstance.text = "Fireball: 3";
-    }
+        rb.isKinematic = false;
 
-    float countdown = fireballCountdownDuration;
-    while (countdown > 0)
-    {
-        countdown -= Time.deltaTime;
+        // Perform dash BEFORE declaring fireball active
+        while (dashElapsed < dashDuration)
+        {
+            rb.linearVelocity = dashDirection * fireballDashSpeed;
+            dashElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        rb.linearVelocity = Vector3.zero;
+        rb.isKinematic = true;
+
+        // Declare fireball active ONLY after dash is completed
+        isFireballActive = true;
+
+        if (fireballCountdownTextPrefab != null)
+        {
+            Vector3 textPos = transform.position + new Vector3(0, 3f, 0);
+            fireballCountdownInstance = Instantiate(fireballCountdownTextPrefab, textPos, Quaternion.identity, transform);
+            fireballCountdownInstance.text = "Fireball: 3";
+        }
+
+        float countdown = fireballCountdownDuration;
+        while (countdown > 0)
+        {
+            countdown -= Time.deltaTime;
+            if (fireballCountdownInstance != null)
+            {
+                fireballCountdownInstance.text = $"Fireball: {Mathf.CeilToInt(countdown)}";
+            }
+            yield return null;
+        }
+
         if (fireballCountdownInstance != null)
         {
-            fireballCountdownInstance.text = $"Fireball: {Mathf.CeilToInt(countdown)}";
+            Destroy(fireballCountdownInstance.gameObject);
         }
-        yield return null;
+
+        Vector3 fireballSpawnPos = transform.position + Vector3.up * 1.5f;
+
+        Vector3 targetPos = player.transform.position;
+        targetPos.z = fireballSpawnPos.z;
+
+        GameObject fireballInstance = Instantiate(fireballPrefab, fireballSpawnPos, Quaternion.identity);
+        Fireball fireballScript = fireballInstance.GetComponent<Fireball>();
+        if (fireballScript != null)
+        {
+            fireballScript.Initialize(targetPos, fireballDamage, explosionVFXPrefab);
+        }
+
+        agent.enabled = true;
+        agent.isStopped = false;
+
+        isFireballActive = false;
     }
-
-    if (fireballCountdownInstance != null)
-    {
-        Destroy(fireballCountdownInstance.gameObject);
-    }
-
-    Vector3 fireballSpawnPos = transform.position + Vector3.up * 1.5f;
-
-    Vector3 targetPos = player.transform.position;
-    targetPos.z = fireballSpawnPos.z;
-
-    GameObject fireballInstance = Instantiate(fireballPrefab, fireballSpawnPos, Quaternion.identity);
-    Fireball fireballScript = fireballInstance.GetComponent<Fireball>();
-    if (fireballScript != null)
-    {
-        fireballScript.Initialize(targetPos, fireballDamage, explosionVFXPrefab);
-    }
-
-    agent.enabled = true;
-    agent.isStopped = false;
-
-    isFireballActive = false;
-}
-
 
     private void HandleRetreat()
     {
+        agent.isStopped = false;
+
         float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
 
         if (distanceToPlayer < retreatBreakRange)
@@ -268,14 +267,17 @@ public class BossAI : MonoBehaviour
 
         if (retreatState == RetreatState.BackingOut)
         {
-            agent.SetDestination(retreatBackTarget);
+            if (agent.destination != retreatBackTarget)
+                agent.SetDestination(retreatBackTarget);
 
-            if (!agent.pathPending && agent.remainingDistance <= 0.1f)
+            if (!agent.pathPending && agent.remainingDistance <= 0.3f)
             {
                 retreatCenterPoint = transform.position;
                 retreatState = RetreatState.Shuffling;
                 retreatShuffleDirection = 1f;
             }
+
+            FaceAwayFromPlayer();
         }
         else if (retreatState == RetreatState.Shuffling)
         {
@@ -294,6 +296,17 @@ public class BossAI : MonoBehaviour
         }
     }
 
+    private void FaceAwayFromPlayer()
+    {
+        if (player == null) return;
+
+        Vector3 direction = player.transform.position - transform.position;
+        if (direction.x > 0)
+            transform.rotation = Quaternion.Euler(0, 180, 0);
+        else
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+    }
+
     private void EndRetreat()
     {
         isRetreating = false;
@@ -310,6 +323,7 @@ public class BossAI : MonoBehaviour
 
     private void ChasePlayer()
     {
+        if (isRetreating) return;
         if (player != null)
         {
             agent.SetDestination(player.transform.position);
@@ -318,6 +332,7 @@ public class BossAI : MonoBehaviour
 
     private void MoveToLastSeenDirection()
     {
+        if (isRetreating) return;
         agent.SetDestination(lastSeenPlayerPosition);
     }
 
@@ -379,7 +394,6 @@ public class BossAI : MonoBehaviour
         }
     }
 
-    // Call this method to trigger retreat externally
     public void TriggerRetreat()
     {
         if (!isRetreating)
