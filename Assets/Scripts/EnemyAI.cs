@@ -262,7 +262,7 @@ public class EnemyAI : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0, 0, -10);
             else
                 transform.rotation = Quaternion.Euler(50, 0, -50);
-            comboStep = Random.Range(1, 5);
+            //comboStep = Random.Range(1, 5);
 
             
 
