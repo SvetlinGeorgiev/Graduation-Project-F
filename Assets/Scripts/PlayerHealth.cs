@@ -87,17 +87,33 @@ public class PlayerHealth : MonoBehaviour
     }
 
     private void Die()
+{
+    Debug.Log("Player Died!");
+
+    // Reset health
+    currentHealth = maxHealth;
+    healthBar.value = currentHealth;
+
+    if (respawnPoint != null && rb != null)
     {
-        // Reset health
-        currentHealth = maxHealth;
-        healthBar.value = currentHealth;
+        // Completely reset physics state
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        
+        // Instantly move the rigidbody
+        rb.position = respawnPoint.position;
+        rb.rotation = respawnPoint.rotation;
 
-        // Teleport to respawn point
-        if (respawnPoint != null)
-        {
-            transform.position = respawnPoint.position;
-        }
-
-        Debug.Log("Player Respawned");
+        // Clear any interpolation offset
+        rb.Sleep();
     }
+    else if (respawnPoint != null)
+    {
+        transform.position = respawnPoint.position;
+        transform.rotation = respawnPoint.rotation;
+    }
+
+    UpdatePotionUI();
+}
+
 }
