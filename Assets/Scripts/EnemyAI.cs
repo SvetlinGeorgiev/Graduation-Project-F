@@ -13,6 +13,10 @@ public class EnemyAI : MonoBehaviour
     public float patrolTime = 1f;
     public float chaseLostDuration = 5f;
 
+    private int comboStep = 0;
+    [SerializeField]
+    private Animator animEnemy;
+
     public Transform groundCheck;
     public LayerMask groundLayer;
     public int attackDamage = 20;
@@ -130,11 +134,13 @@ public class EnemyAI : MonoBehaviour
 
     private void Patrol()
     {
+        animEnemy.SetBool("Walking", true);
         if ((linkMover != null && linkMover.IsTraversing) || agent.isOnOffMeshLink)
             return;
 
         if (!hasPatrolDestination && !agent.pathPending && !agent.hasPath)
         {
+            
             float patrolDistance = Random.Range(patrolDistanceMin, patrolDistanceMax);
 
             Vector3 horizontalDir = Random.value > 0.5f ? Vector3.right : Vector3.left;
@@ -223,16 +229,18 @@ public class EnemyAI : MonoBehaviour
 
     private IEnumerator IdleAnimation()
     {
-        float tiltAmount = 10f;
-        float tiltSpeed = 2f;
+        //float tiltAmount = 10f;
+        //float tiltSpeed = 2f;
         float timeElapsed = 0f;
 
         while (timeElapsed < patrolTime)
         {
-            float angle = Mathf.Sin(Time.time * tiltSpeed) * tiltAmount;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
+            animEnemy.SetBool("Idle", true);
+           // float angle = Mathf.Sin(Time.time * tiltSpeed) * tiltAmount;
+           // transform.rotation = Quaternion.Euler(0, 0, angle);
             timeElapsed += Time.deltaTime;
             yield return null;
+
         }
 
         transform.rotation = Quaternion.identity;
@@ -241,18 +249,22 @@ public class EnemyAI : MonoBehaviour
     private IEnumerator PerformAttack()
     {
         isAttacking = true;
-        int comboCount = Random.Range(1, 4);
+        int comboCount = Random.Range(1, 6);
 
         for (int i = 0; i < comboCount; i++)
         {
             int attackType = Random.Range(0, 3);
 
             if (attackType == 0)
-                transform.rotation = Quaternion.Euler(0, 0, 10);
+                StartCoroutine(PerformAttackTilt(comboStep));
+
             else if (attackType == 1)
                 transform.rotation = Quaternion.Euler(0, 0, -10);
             else
                 transform.rotation = Quaternion.Euler(50, 0, -50);
+            comboStep = Random.Range(1, 5);
+
+            
 
             if (Vector3.Distance(transform.position, player.transform.position) < 2f)
             {
@@ -281,6 +293,25 @@ public class EnemyAI : MonoBehaviour
         isAttacking = false;
     }
 
+    private IEnumerator PerformAttackTilt(int hit)
+    {
+        isAttacking = true;
+
+
+        switch (hit)
+        {
+            case 1: animEnemy.SetTrigger("Hit"); break;
+            case 2: animEnemy.SetTrigger("Hit2"); break;
+            case 3: animEnemy.SetTrigger("Uppercut"); break;
+            case 4: animEnemy.SetTrigger("Low Kick"); break;
+            case 5: animEnemy.SetTrigger("High Kick"); break;
+
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        isAttacking = false;
+    }
     private void DashTowardsPlayer()
     {
         if (player == null) return;
