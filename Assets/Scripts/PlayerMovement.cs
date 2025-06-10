@@ -73,11 +73,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Walking
+     
         if (!isKnockedBack && !isClimbing && !isChainPunching)
         {
             rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
-            // Facing Direction bool: true = right, false = left
             if (moveInput.x > 0)
             {
                 anim.SetBool("Walk", true);
@@ -104,15 +103,15 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         anim.SetBool("Walk", false);
-        Debug.Log("Jump");
+        //.Log("Jump");
         if (isClimbing)
         {
-            Debug.Log("Jumping Climb");
+            //Debug.Log("Jumping Climb");
             return;
         }
         if (isGrounded)
         {
-            Debug.Log("Jumping grounded");
+            //Debug.Log("Jumping grounded");
            
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             isGrounded = false;
@@ -124,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (canDoubleJump)
         {
-            Debug.Log("Jumping Double");
+            //Debug.Log("Jumping Double");
             
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             canDoubleJump = false;
@@ -133,22 +132,20 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Roll()
     {
-        Debug.Log("Roll"); 
+        //Debug.Log("Roll"); 
         if (isGrounded == true)
         {
-            Debug.Log("Roll Animation");
+            //Debug.Log("Roll Animation");
             anim.SetTrigger("Roll");
             if (facingRight)
             {
-                Debug.Log("Roll Right");
-                //rb.linearVelocity = new Vector3(jumpForce, rb.linearVelocity.y, rb.linearVelocity.z);
-                //StartCoroutine(RollAnimation("Right"));
+                //Debug.Log("Roll Right");
+                
             }
             else
             {
-                Debug.Log("Roll Left");
-                //rb.linearVelocity = new Vector3(-jumpForce, rb.linearVelocity.y, rb.linearVelocity.z);
-                //StartCoroutine(RollAnimation("Left"));
+                //Debug.Log("Roll Left");
+                
             }
 
         }
@@ -178,23 +175,16 @@ public class PlayerMovement : MonoBehaviour
     public void UnlockDoubleJump()
     {
         hasDoubleJumpAbility = true;
-        Debug.Log("Double Jump Unlocked!");
+        //Debug.Log("Double Jump Unlocked!");
     }
 
     private IEnumerator FlipAnimation()
     {
         anim.SetTrigger("DoubleJump");
         anim.SetBool("Walk", false);
-        //float rotation = 0;
-
-        //while (rotation < 360)
-        //{
-        //    float step = flipSpeed * Time.deltaTime;
-        //    transform.Rotate(Vector3.forward, step);
-        //    rotation += step;
+        
         yield return null;
-        //}
-        //transform.rotation = Quaternion.identity;
+        
     }
 
     public void TakeDamage(Vector3 damageSource)
@@ -221,8 +211,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isAttacking || !canAttack || isChainPunching) return;
 
-        //comboStep++;
-        // if (comboStep > 3) comboStep = 1;
+       
         comboStep = Random.Range(1, 5);
 
         if (comboResetCoroutine != null)
@@ -237,8 +226,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isAttacking || !canAttack || isChainPunching) return;
 
-        //comboStep++;
-        // if (comboStep > 3) comboStep = 1;
+      
         comboStep = Random.Range(1, 3);
 
         if (comboResetCoroutine != null)
@@ -268,23 +256,20 @@ public class PlayerMovement : MonoBehaviour
             {
                 health.TakeDamage(attackDamage);
             }
+
+            BossHealth bossHealth = enemy.GetComponent<BossHealth>();
+            if (bossHealth != null)
+            {
+                bossHealth.TakeDamage(attackDamage);
+            }
         }
     }
+
 
     private IEnumerator PerformAttackTilt(int hit)
     {
         isAttacking = true;
-        //float tiltDuration = 0.15f;
         
-
-       // Quaternion attackRotation = originalRotation;
-
-        /*switch (step)
-        {
-            case 1: attackRotation = Quaternion.Euler(0, 0, 20f); break;
-            case 2: attackRotation = Quaternion.Euler(0, 0, -20f); break;
-            case 3: attackRotation = Quaternion.Euler(20f, 0, 0); break;
-        }*/
 
         switch (hit)
         {
@@ -295,28 +280,18 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
-        //transform.rotation = attackRotation;
+      
 
         DetectAndDamageEnemies();
 
         yield return new WaitForSeconds(1f);
-        //transform.rotation = originalRotation;
+       
         isAttacking = false;
     }
     private IEnumerator PerformKick(int kick)
     {
         isAttacking = true;
-        //float tiltDuration = 0.15f;
-
-
-        // Quaternion attackRotation = originalRotation;
-
-        /*switch (step)
-        {
-            case 1: attackRotation = Quaternion.Euler(0, 0, 20f); break;
-            case 2: attackRotation = Quaternion.Euler(0, 0, -20f); break;
-            case 3: attackRotation = Quaternion.Euler(20f, 0, 0); break;
-        }*/
+        
 
         switch (kick)
         {
@@ -324,12 +299,11 @@ public class PlayerMovement : MonoBehaviour
             case 2: anim.SetTrigger("Kick2"); break;
         }
 
-        //transform.rotation = attackRotation;
+       
 
         DetectAndDamageEnemies();
 
         yield return new WaitForSeconds(1f);
-        //transform.rotation = originalRotation;
         isAttacking = false;
     }
 

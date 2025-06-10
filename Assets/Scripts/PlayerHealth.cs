@@ -1,30 +1,53 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerHealth : MonoBehaviour
 {
+    [Header("Health Settings")]
     public int maxHealth = 100;
-    private int currentHealth;
-    public Slider healthBar; 
+    [HideInInspector] public int currentHealth;
+    public Slider healthBar;
+
+    [Header("Potion Settings")]
+    public int potionCount = 0;
+    public int potionHealAmount = 20;
+    public TextMeshProUGUI potionUIText;
+
+    [Header("Respawn Settings")]
+    public Transform respawnPoint;    // Assign your start point here
 
     private PlayerControls controls;
+    private Rigidbody rb;
 
     private void Awake()
     {
         controls = new PlayerControls();
-        controls.Player.UseItem.performed += ctx => UseItem();
+        controls.Player.UseItem.performed += ctx => UsePotion();
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Start()
     {
+        // Initialize health and UI
         currentHealth = maxHealth;
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
+        UpdatePotionUI();
     }
 
     private void OnEnable() => controls.Enable();
     private void OnDisable() => controls.Disable();
+
+    private void Update()
+    {
+        // Fallback keypress for E
+        if (Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            UsePotion();
+        }
+    }
 
     public void TakeDamage(int damage)
     {
@@ -32,9 +55,7 @@ public class PlayerHealth : MonoBehaviour
         healthBar.value = currentHealth;
 
         if (currentHealth <= 0)
-        {
             Die();
-        }
     }
 
     public void RestoreHealth(int amount)
@@ -43,18 +64,56 @@ public class PlayerHealth : MonoBehaviour
         healthBar.value = currentHealth;
     }
 
-    private void UseItem()
+    public void AddPotion()
     {
-        InventoryManager inventory = GetComponent<InventoryManager>();
-        if (inventory != null)
+        potionCount++;
+        UpdatePotionUI();
+    }
+
+    private void UsePotion()
+    {
+        if (potionCount > 0 && currentHealth < maxHealth)
         {
-            inventory.UseItem(0); 
+            RestoreHealth(potionHealAmount);
+            potionCount--;
+            UpdatePotionUI();
         }
     }
 
+    private void UpdatePotionUI()
+    {
+        if (potionUIText != null)
+            potionUIText.text = $"Potions: {potionCount}";
+    }
 
     private void Die()
+{
+    Debug.Log("Player Died!");
+
+    // Reset health
+    currentHealth = maxHealth;
+    healthBar.value = currentHealth;
+
+    if (respawnPoint != null && rb != null)
     {
-        Debug.Log("Player Died!");
+        // Completely reset physics state
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        
+        // Instantly move the rigidbody
+        rb.position = respawnPoint.position;
+        rb.rotation = respawnPoint.rotation;
+
+        // Clear any interpolation offset
+        rb.Sleep();
     }
+    else if (respawnPoint != null)
+    {
+        transform.position = respawnPoint.position;
+        transform.rotation = respawnPoint.rotation;
+    }
+
+    UpdatePotionUI();
+}
+
 }

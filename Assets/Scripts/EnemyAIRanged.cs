@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.AI;
 
 public class EnemyAIRanged : MonoBehaviour
 {
@@ -10,15 +11,11 @@ public class EnemyAIRanged : MonoBehaviour
     public float runAwayRange = 5f;
     public float throwProjectileRange = 4f;
     public float dashForce = 10f;
-    public float attackCooldown = 2f;
     public float patrolTime = 2f;
     public float chaseLostDuration = 5f;
     public GameObject projectilePrefab;
     public float knockbackForce = 5f;
 
-    public Transform edgeCheck, edgeCheckLeft;
-    public Transform upperPlatformCheck, upperPlatformCheckLeft;
-    public Transform lowerPlatformCheck, lowerPlatformCheckLeft;
     public Transform groundCheck;
     public LayerMask groundLayer;
     public int attackDamage = 20;
@@ -26,23 +23,32 @@ public class EnemyAIRanged : MonoBehaviour
     public float attackCooldownMax = 3f;
 
     private Rigidbody rb;
+    private NavMeshAgent agent;
+    private AgentLinkMover linkMover;
     private bool isGrounded;
     private bool isChasing = false;
     private bool isIdle = false;
     private bool isSearching = false;
     private bool isAttacking = false;
-    private float searchTimer = 0f;
-    private float lastAttackTime = 0f;
-    private float attackCooldownTimer = 0f;
-    private float nextComboTime = 0f;
 
-    private Vector3 movementDirection;
+    private float searchTimer = 0f;
+    private float nextComboTime = 0f;
+    private float lastProjectileTime = 0f;
     private Vector3 lastSeenPlayerPosition;
     private GameObject player;
+
+    private Vector3 patrolDestination;
+    private bool hasPatrolDestination = false;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
+        linkMover = GetComponent<AgentLinkMover>();
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
+        agent.speed = moveSpeed;
+
         player = GameObject.FindGameObjectWithTag("Player");
         StartCoroutine(RandomBehavior());
     }
@@ -50,6 +56,15 @@ public class EnemyAIRanged : MonoBehaviour
     private void FixedUpdate()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundLayer);
+
+        if (linkMover != null && linkMover.IsTraversing)
+        {
+            agent.ResetPath();
+            return;
+        }
+
+        if (agent.isOnOffMeshLink)
+            return;
 
         if (CanSeePlayer())
         {
@@ -59,6 +74,7 @@ public class EnemyAIRanged : MonoBehaviour
             lastSeenPlayerPosition = player.transform.position;
 
             float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+            FaceTarget(player.transform.position);
 
             if (distanceToPlayer <= attackRange)
             {
@@ -66,14 +82,20 @@ public class EnemyAIRanged : MonoBehaviour
                 {
                     StartCoroutine(PerformAttack());
                 }
+                agent.ResetPath();
             }
-            else if (distanceToPlayer <= runAwayRange)
+            else if (distanceToPlayer <= runAwayRange && distanceToPlayer > attackRange)
             {
                 RunAwayFromPlayer();
             }
             else if (distanceToPlayer <= throwProjectileRange)
             {
-                ThrowProjectile();
+                TryThrowProjectile();
+                if (agent.hasPath)
+                {
+                    agent.ResetPath();
+                    hasPatrolDestination = false;
+                }
             }
             else
             {
@@ -90,9 +112,11 @@ public class EnemyAIRanged : MonoBehaviour
         if (isSearching)
         {
             searchTimer -= Time.fixedDeltaTime;
+
             if (searchTimer > 0)
             {
                 MoveToLastSeenDirection();
+                FaceTarget(lastSeenPlayerPosition);
             }
             else
             {
@@ -101,12 +125,14 @@ public class EnemyAIRanged : MonoBehaviour
             }
         }
 
-        if (!isChasing && !isSearching && !isIdle)
+        if (!isChasing && !isSearching && !isIdle && !agent.isOnOffMeshLink && (linkMover == null || !linkMover.IsTraversing))
         {
             Patrol();
         }
 
-        CheckForPlatformsAndEdges();
+        Vector3 fixedPosition = transform.position;
+        fixedPosition.z = -16.4f;
+        transform.position = fixedPosition;
     }
 
     private bool CanSeePlayer()
@@ -118,68 +144,130 @@ public class EnemyAIRanged : MonoBehaviour
 
     private void Patrol()
     {
-        rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        if ((linkMover != null && linkMover.IsTraversing) || agent.isOnOffMeshLink)
+            return;
+
+        if (!hasPatrolDestination && !agent.pathPending && !agent.hasPath)
+        {
+            float patrolDistance = Random.Range(2f, 15f);
+
+            Vector3 horizontalDir = Random.value > 0.5f ? Vector3.right : Vector3.left;
+            Vector3 targetPos = transform.position + horizontalDir * patrolDistance;
+
+            RaycastHit hitInfo;
+            if (Physics.Raycast(targetPos + Vector3.up * 5f, Vector3.down, out hitInfo, 10f, groundLayer))
+            {
+                targetPos.y = hitInfo.point.y + 0.1f;
+            }
+
+            NavMeshHit navHit;
+            if (NavMesh.SamplePosition(targetPos, out navHit, 7f, NavMesh.AllAreas))
+            {
+                patrolDestination = navHit.position;
+                if (agent.SetDestination(patrolDestination))
+                {
+                    hasPatrolDestination = true;
+                    FaceTarget(patrolDestination);
+                    Debug.DrawLine(transform.position, patrolDestination, Color.cyan, 2f);
+                }
+            }
+        }
+
+        if (hasPatrolDestination && !agent.pathPending)
+        {
+            if (agent.remainingDistance <= agent.stoppingDistance + 0.1f && agent.velocity.sqrMagnitude < 0.01f)
+            {
+                hasPatrolDestination = false;
+            }
+        }
     }
 
     private void ChasePlayer()
     {
         if (player == null) return;
-
-        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-        if (distanceToPlayer > runAwayRange && distanceToPlayer <= detectionRange)
-        {
-            Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-            movementDirection = new Vector3(Mathf.Sign(directionToPlayer.x), 0, 0);
-            rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
-        }
+        agent.SetDestination(player.transform.position);
+        FaceTarget(player.transform.position);
     }
 
     private void MoveToLastSeenDirection()
     {
-        Vector3 direction = (lastSeenPlayerPosition - transform.position).normalized;
-        movementDirection = new Vector3(Mathf.Sign(direction.x), 0, 0);
-        rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
+        agent.SetDestination(lastSeenPlayerPosition);
     }
 
     private void RunAwayFromPlayer()
     {
         if (player == null) return;
+        Vector3 directionAway = (transform.position - player.transform.position).normalized;
+        Vector3 runTo = transform.position + directionAway * 5f;
+
+        NavMeshHit navHit;
+        if (NavMesh.SamplePosition(runTo, out navHit, 5f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(navHit.position);
+            FaceTarget(runTo);
+        }
+    }
+
+    private void TryThrowProjectile()
+    {
+        if (projectilePrefab == null || player == null) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-        if (distanceToPlayer <= runAwayRange && distanceToPlayer > attackRange)
+
+        if (Time.time >= lastProjectileTime + Random.Range(attackCooldownMin, attackCooldownMax))
         {
-            Vector3 directionAwayFromPlayer = (transform.position - player.transform.position).normalized;
-            movementDirection = new Vector3(Mathf.Sign(directionAwayFromPlayer.x), 0, 0);
-            rb.linearVelocity = new Vector3(movementDirection.x * moveSpeed, rb.linearVelocity.y, 0);
-        }
-    }
+            Vector3 origin = transform.position + Vector3.up * 1.5f;
+            Vector3 target = player.transform.position + Vector3.up * 1f;
+            Vector3 direction = (target - origin).normalized;
 
-    private void ThrowProjectile()
-    {
-        Debug.Log("Throw projectile");
-        if (projectilePrefab != null && Time.time >= lastAttackTime + attackCooldown)
-        {
-            lastAttackTime = Time.time;
-
-            GameObject projectile = Instantiate(projectilePrefab, transform.position + Vector3.up, Quaternion.identity);
-            Vector3 direction = (player.transform.position - transform.position).normalized;
-
-            Rigidbody rbProjectile = projectile.GetComponent<Rigidbody>();
-            if (rbProjectile != null)
+            if (Physics.Raycast(origin, direction, out RaycastHit hit, distanceToPlayer))
             {
-                rbProjectile.linearVelocity = direction * 10f; 
+                if (hit.collider.CompareTag("Player"))
+                {
+                    lastProjectileTime = Time.time;
+
+                    GameObject projectile = Instantiate(projectilePrefab, origin, Quaternion.identity);
+                    Rigidbody rbProjectile = projectile.GetComponent<Rigidbody>();
+
+                    if (rbProjectile != null)
+                    {
+                        rbProjectile.linearVelocity = direction * 10f;
+                    }
+
+                    StartCoroutine(HandleProjectileDamage(projectile));
+                    FaceTarget(player.transform.position);
+
+                    if (agent.hasPath) agent.ResetPath();
+                    hasPatrolDestination = false;
+                    return;
+                }
             }
 
-            StartCoroutine(HandleProjectileDamage(projectile));
+            if (distanceToPlayer > runAwayRange)
+            {
+                Vector3 approachDirection = (player.transform.position - transform.position).normalized;
+                float safeDistance = runAwayRange - 0.5f;
+                Vector3 approachPosition = player.transform.position - approachDirection * safeDistance;
+
+                NavMeshHit navHit;
+                if (NavMesh.SamplePosition(approachPosition, out navHit, 5f, NavMesh.AllAreas))
+                {
+                    agent.SetDestination(navHit.position);
+                    FaceTarget(navHit.position);
+                    hasPatrolDestination = false;
+                }
+            }
+            else
+            {
+                if (agent.hasPath) agent.ResetPath();
+            }
         }
     }
-
 
     private IEnumerator HandleProjectileDamage(GameObject projectile)
     {
         float lifetime = 3f;
         float timer = 0f;
-        Debug.Log("Handle projectile");
         while (projectile != null && timer < lifetime)
         {
             if (player != null && Vector3.Distance(projectile.transform.position, player.transform.position) < 1.5f)
@@ -188,9 +276,7 @@ public class EnemyAIRanged : MonoBehaviour
                 if (health != null)
                 {
                     health.TakeDamage(attackDamage);
-                    Debug.Log("Damage projectile");
                 }
-
                 Destroy(projectile);
                 break;
             }
@@ -215,61 +301,23 @@ public class EnemyAIRanged : MonoBehaviour
             if (isIdle)
             {
                 StartCoroutine(IdleAnimation());
+                if (agent.hasPath)
+                {
+                    agent.ResetPath();
+                    hasPatrolDestination = false;
+                }
             }
             else
             {
-                movementDirection = (Random.value > 0.5f) ? Vector3.right : Vector3.left;
+                if (!hasPatrolDestination)
+                {
+                    agent.ResetPath();
+                    hasPatrolDestination = false;
+                }
             }
 
             yield return new WaitForSeconds(waitTime);
         }
-    }
-
-    private void CheckForPlatformsAndEdges()
-    {
-        bool movingRight = movementDirection.x > 0;
-        Transform edgeCheckPos = movingRight ? edgeCheck : edgeCheckLeft;
-        Transform upperCheckPos = movingRight ? upperPlatformCheck : upperPlatformCheckLeft;
-        Transform lowerCheckPos = movingRight ? lowerPlatformCheck : lowerPlatformCheckLeft;
-
-        bool edgeDetected = !Physics.Raycast(edgeCheckPos.position, Vector3.down, 1f, groundLayer);
-
-        RaycastHit upperHit;
-        bool upperDetected = Physics.Raycast(edgeCheckPos.position, (upperCheckPos.position - edgeCheckPos.position).normalized, out upperHit, Vector3.Distance(edgeCheckPos.position, upperCheckPos.position), groundLayer);
-
-        RaycastHit lowerHit;
-        bool lowerDetected = Physics.Raycast(lowerCheckPos.position, movementDirection, out lowerHit, 1.5f, groundLayer);
-
-        RaycastHit headHit;
-        bool headBlocked = Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.up, out headHit, upperCheckPos.position.y - (transform.position.y + 0.5f), groundLayer);
-
-        if (upperDetected && isGrounded && !headBlocked)
-        {
-            float platformY = upperHit.point.y;
-            float enemyY = transform.position.y;
-            if (platformY > enemyY + 0.2f)
-            {
-                Jump();
-            }
-        }
-        else if (edgeDetected && lowerDetected && isGrounded)
-        {
-            StartCoroutine(DelayedJump());
-        }
-    }
-
-    private IEnumerator DelayedJump()
-    {
-        yield return new WaitForSeconds(0.2f);
-        if (isGrounded)
-        {
-            Jump();
-        }
-    }
-
-    private void Jump()
-    {
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, 0);
     }
 
     private IEnumerator IdleAnimation()
@@ -296,11 +344,19 @@ public class EnemyAIRanged : MonoBehaviour
 
         for (int i = 0; i < comboCount; i++)
         {
+            if (player != null)
+            {
+                FaceTarget(player.transform.position);
+            }
+
             int attackType = Random.Range(0, 3);
 
-            if (attackType == 0) transform.rotation = Quaternion.Euler(0, 0, 10);
-            else if (attackType == 1) transform.rotation = Quaternion.Euler(0, 0, -10);
-            else if (attackType == 2) transform.rotation = Quaternion.Euler(50, 0, -50);
+            if (attackType == 0)
+                transform.rotation = Quaternion.Euler(0, 0, 10);
+            else if (attackType == 1)
+                transform.rotation = Quaternion.Euler(0, 0, -10);
+            else
+                transform.rotation = Quaternion.Euler(50, 0, -50);
 
             if (Vector3.Distance(transform.position, player.transform.position) < 2f)
             {
@@ -310,19 +366,30 @@ public class EnemyAIRanged : MonoBehaviour
                     playerHealth.TakeDamage(attackDamage);
                 }
 
-                Vector3 knockbackDir = (player.transform.position - transform.position).normalized;
+                Vector3 knockbackDirection = (player.transform.position - transform.position).normalized;
                 Rigidbody playerRb = player.GetComponent<Rigidbody>();
                 if (playerRb != null)
                 {
-                    playerRb.AddForce(knockbackDir * knockbackForce, ForceMode.Impulse);
+                    playerRb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
                 }
             }
 
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(Random.Range(attackCooldownMin, attackCooldownMax));
         }
 
         transform.rotation = Quaternion.identity;
         nextComboTime = Time.time + Random.Range(attackCooldownMin, attackCooldownMax);
         isAttacking = false;
+    }
+
+    private void FaceTarget(Vector3 targetPos)
+    {
+        Vector3 direction = (targetPos - transform.position).normalized;
+        if (direction.x != 0)
+        {
+            Vector3 localScale = transform.localScale;
+            localScale.x = Mathf.Sign(direction.x) * Mathf.Abs(localScale.x);
+            transform.localScale = localScale;
+        }
     }
 }
