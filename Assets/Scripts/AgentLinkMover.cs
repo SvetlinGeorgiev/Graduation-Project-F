@@ -17,6 +17,7 @@ public class AgentLinkMover : MonoBehaviour
     public AnimationCurve m_Curve = new AnimationCurve();
     private bool isTraversing = false;
 
+    public Animator anim;
     public bool IsTraversing => isTraversing;
 
     private IEnumerator Start()
@@ -28,6 +29,9 @@ public class AgentLinkMover : MonoBehaviour
             if (agent.isOnOffMeshLink && !isTraversing)
             {
                 isTraversing = true;
+                Debug.Log("Jump");
+               // anim.SetBool("Walking", false);
+                anim.SetTrigger("Jump");
 
                 if (m_Method == OffMeshLinkMoveMethod.NormalSpeed)
                     yield return StartCoroutine(NormalSpeed(agent));
@@ -40,6 +44,7 @@ public class AgentLinkMover : MonoBehaviour
 
                 agent.CompleteOffMeshLink();
                 isTraversing = false;
+               // anim.SetBool("Walking", true);
             }
             yield return null;
         }

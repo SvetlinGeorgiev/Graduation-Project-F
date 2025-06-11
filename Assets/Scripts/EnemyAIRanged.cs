@@ -40,6 +40,8 @@ public class EnemyAIRanged : MonoBehaviour
     private Vector3 patrolDestination;
     private bool hasPatrolDestination = false;
 
+    public Animator anim;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -352,11 +354,20 @@ public class EnemyAIRanged : MonoBehaviour
             int attackType = Random.Range(0, 3);
 
             if (attackType == 0)
-                transform.rotation = Quaternion.Euler(0, 0, 10);
+            {
+                anim.SetTrigger("Hit2");
+                //StartCoroutine(PerformAttackTilt(comboStep));
+            }
             else if (attackType == 1)
-                transform.rotation = Quaternion.Euler(0, 0, -10);
+            {
+                anim.SetTrigger("Uppercut");
+                //transform.rotation = Quaternion.Euler(0, 0, -10);
+            }
             else
-                transform.rotation = Quaternion.Euler(50, 0, -50);
+            {
+                anim.SetTrigger("Low Kick");
+                //transform.rotation = Quaternion.Euler(50, 0, -50);
+            }
 
             if (Vector3.Distance(transform.position, player.transform.position) < 2f)
             {

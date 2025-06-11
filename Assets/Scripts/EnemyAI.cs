@@ -69,7 +69,9 @@ public class EnemyAI : MonoBehaviour
 
         if (agent.isOnOffMeshLink)
         {
+            
             return;
+
         }
 
         if (CanSeePlayer())
@@ -134,9 +136,13 @@ public class EnemyAI : MonoBehaviour
 
     private void Patrol()
     {
-        animEnemy.SetBool("Walking", true);
+        
         if ((linkMover != null && linkMover.IsTraversing) || agent.isOnOffMeshLink)
+        {
+            
             return;
+        }
+         
 
         if (!hasPatrolDestination && !agent.pathPending && !agent.hasPath)
         {
@@ -152,9 +158,11 @@ public class EnemyAI : MonoBehaviour
             Vector3 targetPos = transform.position + direction * patrolDistance;
 
             RaycastHit hitInfo;
+
             if (Physics.Raycast(targetPos + Vector3.up * 5f, Vector3.down, out hitInfo, 10f, groundLayer))
             {
                 targetPos.y = hitInfo.point.y + 0.1f; 
+
             }
 
             NavMeshHit navHit;
@@ -167,6 +175,10 @@ public class EnemyAI : MonoBehaviour
                     hasPatrolDestination = true;
                     wasMovingToPatrol = true;
 
+                    animEnemy.SetBool("Walking", true);
+                    Debug.Log("Start walking");
+                   
+
                     Debug.DrawLine(transform.position, patrolDestination, Color.green, 2f);
                     Debug.Log($"Patrolling to {patrolDestination}");
                 }
@@ -175,13 +187,22 @@ public class EnemyAI : MonoBehaviour
 
         if (hasPatrolDestination && !agent.pathPending)
         {
-            if (agent.remainingDistance <= agent.stoppingDistance + 0.1f && agent.velocity.sqrMagnitude < 0.01f)
+            if (agent.remainingDistance <= agent.stoppingDistance + 0.1f)
             {
-                hasPatrolDestination = false;
-                wasMovingToPatrol = false;
+            animEnemy.SetBool("Walking", false);
+            Debug.Log("Stop walking");
+                if (agent.velocity.sqrMagnitude < 0.01f)
+                {
+                    hasPatrolDestination = false;
+                    wasMovingToPatrol = false;
+                
+
+                }
             }
         }
     }
+
+   
 
     private void ChasePlayer()
     {
@@ -256,12 +277,20 @@ public class EnemyAI : MonoBehaviour
             int attackType = Random.Range(0, 3);
 
             if (attackType == 0)
-                StartCoroutine(PerformAttackTilt(comboStep));
-
+            {
+                animEnemy.SetTrigger("Hit2");
+                //StartCoroutine(PerformAttackTilt(comboStep));
+            }
             else if (attackType == 1)
-                transform.rotation = Quaternion.Euler(0, 0, -10);
+            {
+                animEnemy.SetTrigger("Uppercut");
+                //transform.rotation = Quaternion.Euler(0, 0, -10);
+            }
             else
-                transform.rotation = Quaternion.Euler(50, 0, -50);
+            {
+                animEnemy.SetTrigger("Low Kick");
+                //transform.rotation = Quaternion.Euler(50, 0, -50);
+            }
             //comboStep = Random.Range(1, 5);
 
             
@@ -298,15 +327,15 @@ public class EnemyAI : MonoBehaviour
         isAttacking = true;
 
 
-        switch (hit)
-        {
-            case 1: animEnemy.SetTrigger("Hit"); break;
-            case 2: animEnemy.SetTrigger("Hit2"); break;
-            case 3: animEnemy.SetTrigger("Uppercut"); break;
-            case 4: animEnemy.SetTrigger("Low Kick"); break;
-            case 5: animEnemy.SetTrigger("High Kick"); break;
+        //switch (hit)
+        //{
+        //    case 1: animEnemy.SetTrigger("Hit"); break;
+        //    case 2: animEnemy.SetTrigger("Hit2"); break;
+        //    case 3: animEnemy.SetTrigger("Uppercut"); break;
+        //    case 4: animEnemy.SetTrigger("Low Kick"); break;
+        //    case 5: animEnemy.SetTrigger("High Kick"); break;
 
-        }
+        //}
 
         yield return new WaitForSeconds(1f);
 
@@ -318,5 +347,6 @@ public class EnemyAI : MonoBehaviour
 
         Vector3 direction = (player.transform.position - transform.position).normalized;
         rb.AddForce(new Vector3(Mathf.Sign(direction.x) * dashForce, 0, 0), ForceMode.Impulse);
+        
     }
 }

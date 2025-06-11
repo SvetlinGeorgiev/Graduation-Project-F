@@ -61,6 +61,8 @@ public class BossAI : MonoBehaviour
 
     private TextMeshProUGUI fireballCountdownInstance;
 
+    public Animator anim;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -89,6 +91,7 @@ public class BossAI : MonoBehaviour
 
         if (agent.isOnOffMeshLink)
         {
+
             return;
         }
 
@@ -100,6 +103,7 @@ public class BossAI : MonoBehaviour
         if (isRetreating)
         {
             HandleRetreat();
+            anim.SetBool("Walking", true);
             return;
         }
 
@@ -107,6 +111,7 @@ public class BossAI : MonoBehaviour
         {
             if (!bossActivated)
             {
+                anim.SetBool("Walking", true);
                 bossActivated = true;
                 BossHealthBar.Instance.Show();
             }
@@ -169,9 +174,9 @@ public class BossAI : MonoBehaviour
             int rand = Random.Range(1, 5);
 
             if (rand == 1 && (isChasing || isRetreating) && CanSeePlayer())
-{
-    StartCoroutine(FireballSequence());
-}
+                {
+                    StartCoroutine(FireballSequence());
+                }
         }
     }
 
@@ -219,6 +224,7 @@ public class BossAI : MonoBehaviour
             countdown -= Time.deltaTime;
             if (fireballCountdownInstance != null)
             {
+                anim.SetTrigger("Hit");
                 fireballCountdownInstance.text = $"Fireball: {Mathf.CeilToInt(countdown)}";
             }
             yield return null;
@@ -346,11 +352,20 @@ public class BossAI : MonoBehaviour
             int attackType = Random.Range(0, 3);
 
             if (attackType == 0)
-                transform.rotation = Quaternion.Euler(0, 0, 10);
+            {
+                //transform.rotation = Quaternion.Euler(0, 0, 10);
+                anim.SetTrigger("Hit2");
+            }
             else if (attackType == 1)
-                transform.rotation = Quaternion.Euler(0, 0, -10);
+            {
+                anim.SetTrigger("Uppercut");
+                //transform.rotation = Quaternion.Euler(0, 0, -10);
+            }
             else
-                transform.rotation = Quaternion.Euler(0, 0, 0);
+            {
+                anim.SetTrigger("High Kick");
+                //transform.rotation = Quaternion.Euler(0, 0, 0);
+            }
 
             yield return new WaitForSeconds(0.4f);
 

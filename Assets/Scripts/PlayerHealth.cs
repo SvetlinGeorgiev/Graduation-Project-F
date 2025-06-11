@@ -21,6 +21,8 @@ public class PlayerHealth : MonoBehaviour
     private PlayerControls controls;
     private Rigidbody rb;
 
+    public Animator anim;
+
     private void Awake()
     {
         controls = new PlayerControls();
@@ -53,6 +55,8 @@ public class PlayerHealth : MonoBehaviour
     {
         currentHealth -= damage;
         healthBar.value = currentHealth;
+        anim.SetTrigger("GettingHit");
+
 
         if (currentHealth <= 0)
             Die();
