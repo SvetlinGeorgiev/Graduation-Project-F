@@ -5,7 +5,7 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth = 100f;
     private float currentHealth;
     [SerializeField]
-    private Animator anim;
+    //private Animator anim;
     private void Start()
     {
         currentHealth = maxHealth;
@@ -14,12 +14,12 @@ public class EnemyHealth : MonoBehaviour
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
-        anim.SetTrigger("GetsHit");
+        //anim.SetTrigger("GetsHit");
         Debug.Log(gameObject.name + " took " + amount + " damage. Remaining health: " + currentHealth);
 
         if (currentHealth <= 0)
         {
-            anim.SetTrigger("Dead");
+            //anim.SetTrigger("Dead");
             
             Die();
         }
