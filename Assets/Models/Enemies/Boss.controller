@@ -181,7 +181,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -1804037651459696847, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
+  m_Motion: {fileID: -6760131211907993390, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -208,7 +208,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 5025877324202606, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
+  m_Motion: {fileID: -410653991953097668, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -365,7 +365,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Idle 0
+  m_Name: Stick idle
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -387,7 +387,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 363c19c6d69cd724cae9bd4d28ab5b7a, type: 2}
+  m_Motion: {fileID: 4616392584826851852, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -456,14 +456,8 @@ AnimatorStateMachine:
     m_State: {fileID: -1200162247957467873}
     m_Position: {x: -680, y: 690, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 4875059870695650401}
-    m_Position: {x: 1100, y: 720, z: 0}
-  - serializedVersion: 1
     m_State: {fileID: -7556270819012965512}
     m_Position: {x: 350, y: 90, z: 0}
-  - serializedVersion: 1
-    m_State: {fileID: 6721261131115267682}
-    m_Position: {x: 820, y: 630, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3757680767464758579}
     m_Position: {x: -260, y: 520, z: 0}
@@ -812,7 +806,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Enemy
+  m_Name: Boss
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: Walking
@@ -1310,32 +1304,6 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
---- !u!1102 &4875059870695650401
-AnimatorState:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Hit Short 1_001
-  m_Speed: 1
-  m_CycleOffset: 0
-  m_Transitions: []
-  m_StateMachineBehaviours: []
-  m_Position: {x: 50, y: 50, z: 0}
-  m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
-  m_Mirror: 0
-  m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
-  m_CycleOffsetParameterActive: 0
-  m_TimeParameterActive: 0
-  m_Motion: {fileID: -1772394354326659904, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
 --- !u!1101 &5268051998049415087
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1507,33 +1475,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -1772394354326659904, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
---- !u!1102 &6721261131115267682
-AnimatorState:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Running
-  m_Speed: 1
-  m_CycleOffset: 0
-  m_Transitions: []
-  m_StateMachineBehaviours: []
-  m_Position: {x: 50, y: 50, z: 0}
-  m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
-  m_Mirror: 0
-  m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
-  m_CycleOffsetParameterActive: 0
-  m_TimeParameterActive: 0
-  m_Motion: {fileID: -203655887218126122, guid: 1a276e1fe23f9234da271b54cfad998a, type: 3}
+  m_Motion: {fileID: 8842413638430513153, guid: e64db0ecab951b34ea2c9c3584988a46, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
