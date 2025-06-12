@@ -16,7 +16,11 @@ public class PlayerHealth : MonoBehaviour
     public TextMeshProUGUI potionUIText;
 
     [Header("Respawn Settings")]
-    public Transform respawnPoint;    // Assign your start point here
+    public Transform respawnPoint; // (optional initial spawn)
+
+    private Vector3 checkpointPosition;
+    private Quaternion checkpointRotation;
+    private bool hasCheckpoint = false;
 
     private PlayerControls controls;
     private Rigidbody rb;
@@ -32,11 +36,17 @@ public class PlayerHealth : MonoBehaviour
 
     private void Start()
     {
-        // Initialize health and UI
         currentHealth = maxHealth;
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
         UpdatePotionUI();
+
+        if (respawnPoint != null)
+        {
+            checkpointPosition = respawnPoint.position;
+            checkpointRotation = respawnPoint.rotation;
+            hasCheckpoint = true;
+        }
     }
 
     private void OnEnable() => controls.Enable();
@@ -44,7 +54,6 @@ public class PlayerHealth : MonoBehaviour
 
     private void Update()
     {
-        // Fallback keypress for E
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
             UsePotion();
@@ -56,7 +65,6 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= damage;
         healthBar.value = currentHealth;
         //anim.SetTrigger("GettingHit");
-
 
         if (currentHealth <= 0)
             Die();
@@ -91,33 +99,39 @@ public class PlayerHealth : MonoBehaviour
     }
 
     private void Die()
-{
-    Debug.Log("Player Died!");
-
-    // Reset health
-    currentHealth = maxHealth;
-    healthBar.value = currentHealth;
-
-    if (respawnPoint != null && rb != null)
     {
-        // Completely reset physics state
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        
-        // Instantly move the rigidbody
-        rb.position = respawnPoint.position;
-        rb.rotation = respawnPoint.rotation;
+        Debug.Log("Player Died!");
 
-        // Clear any interpolation offset
-        rb.Sleep();
-    }
-    else if (respawnPoint != null)
-    {
-        transform.position = respawnPoint.position;
-        transform.rotation = respawnPoint.rotation;
+        currentHealth = maxHealth;
+        healthBar.value = currentHealth;
+
+        if (hasCheckpoint && rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.position = checkpointPosition;
+            rb.rotation = checkpointRotation;
+            rb.Sleep();
+        }
+        else if (hasCheckpoint)
+        {
+            transform.position = checkpointPosition;
+            transform.rotation = checkpointRotation;
+        }
+
+        UpdatePotionUI();
     }
 
-    UpdatePotionUI();
-}
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Checkpoint"))
+        {
+            checkpointPosition = other.transform.position;
+            checkpointRotation = other.transform.rotation;
+            hasCheckpoint = true;
 
+            Debug.Log("Checkpoint reached at: " + checkpointPosition);
+            Destroy(other.gameObject);
+        }
+    }
 }
