@@ -7,6 +7,9 @@ public class PlayerMovement : MonoBehaviour
     private PlayerControls controls;
     private Rigidbody rb;
     private Vector2 moveInput;
+
+    
+    //ieie: the animator
     [SerializeField]
     private Animator anim;
 
@@ -50,9 +53,10 @@ public class PlayerMovement : MonoBehaviour
     public bool isClimbing = false;
     public bool canAttack = true;
 
+    //ieie: the bool that will set off the facing direction
     [SerializeField]
     private bool facingRight = true;
-
+    
     private void Awake()
     {
         controls = new PlayerControls();
@@ -79,30 +83,39 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, 0);
             if (moveInput.x > 0)
             {
+                //ieie: Based on the direction of the velocity the facingRight is true and the animator activates the walking animation
                 anim.SetBool("Walk", true);
                 facingRight = true;
                 anim.SetBool("FacingRight", true);
+                
                 transform.rotation = new Quaternion(0, -1, 0, 0);
             }
             else if (moveInput.x < 0)
             {
+                //ieie: Switching directions and switching to the part of the animation tree that is for when the character is not facing right
                 anim.SetBool("Walk", true);
                 facingRight = false;
                 anim.SetBool("FacingRight", false);
+                
+
                 transform.rotation = new Quaternion(0, 0, 0, 0);
             }
+            //ieie: wanted to make a state where the character was not moving to make it idle, because it was constantly walking
             else if (moveInput.x == 0)
             {
+                
                 anim.SetBool("Walk", false);
             }
-          
+            
 
         }
     }
    
     private void Jump()
     {
+        //ieie: shouldnt walk while jumping
         anim.SetBool("Walk", false);
+        
         //.Log("Jump");
         if (isClimbing)
         {
@@ -115,8 +128,10 @@ public class PlayerMovement : MonoBehaviour
            
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
             isGrounded = false;
+            //ieie:Makes the character jump and disabling the walking animation
             anim.SetTrigger("Jump");
             anim.SetBool("Walk", false);
+            
             canDoubleJump = hasDoubleJumpAbility;
 
            
@@ -130,8 +145,10 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(FlipAnimation());
         }
     }
+    
     private void Roll()
     {
+        //ieie:I was going to make a roll for the character
         //Debug.Log("Roll"); 
         if (isGrounded == true)
         {
@@ -151,6 +168,7 @@ public class PlayerMovement : MonoBehaviour
         }
         return;
     }
+    
 
 
     private void OnCollisionEnter(Collision collision)
@@ -158,7 +176,9 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+            //ieie: able to roll on the ground
             anim.SetBool("Grounded",true);
+            
         }
     }
 
@@ -166,8 +186,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
+            //ieie: This was to be used for the roll on the ground but other things took priority, th echaracter is supposed to roll only when on the ground
             anim.SetBool("Grounded", false);
-
+            
             isGrounded = false;
         }
     }
@@ -180,6 +201,7 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator FlipAnimation()
     {
+        //ieie:The character flips on double jump and stops walking
         anim.SetTrigger("DoubleJump");
         anim.SetBool("Walk", false);
         
@@ -270,7 +292,7 @@ public class PlayerMovement : MonoBehaviour
     {
         isAttacking = true;
         
-
+        // ieie:The scipt sycles randomly through these 4 animations when hitting, each hit has its own trigger
         switch (hit)
         {
             case 1: anim.SetTrigger("Attack1"); break;
@@ -280,7 +302,7 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
-      
+        
 
         DetectAndDamageEnemies();
 
@@ -288,8 +310,10 @@ public class PlayerMovement : MonoBehaviour
        
         isAttacking = false;
     }
+    
     private IEnumerator PerformKick(int kick)
     {
+        //ieie:I wanted to add kicking but mainly visually so i used the method from the pi=unching but changed the triggers
         isAttacking = true;
         
 
@@ -306,7 +330,7 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(1f);
         isAttacking = false;
     }
-
+    
     private void TryChainPunch()
     {
         if (canUseChainPunch && !isChainPunching)

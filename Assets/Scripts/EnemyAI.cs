@@ -14,6 +14,7 @@ public class EnemyAI : MonoBehaviour
     public float chaseLostDuration = 5f;
 
     private int comboStep = 0;
+    //Declaring the anaimator
     [SerializeField]
     private Animator animEnemy;
 
@@ -169,6 +170,7 @@ public class EnemyAI : MonoBehaviour
                 {
                     hasPatrolDestination = true;
                     wasMovingToPatrol = true;
+                    //ieie: Set off the walking animation
                     animEnemy.SetBool("Walking", true);
                     Debug.DrawLine(transform.position, patrolDestination, Color.green, 2f);
                 }
@@ -179,6 +181,7 @@ public class EnemyAI : MonoBehaviour
         {
             if (agent.remainingDistance <= agent.stoppingDistance + 0.1f)
             {
+                //ieie: Stop the walking
                 animEnemy.SetBool("Walking", false);
                 if (agent.velocity.sqrMagnitude < 0.01f)
                 {
@@ -238,6 +241,7 @@ public class EnemyAI : MonoBehaviour
         float timeElapsed = 0f;
         while (timeElapsed < patrolTime)
         {
+            //ieie: Set off idle animation
             animEnemy.SetBool("Idle", true);
             timeElapsed += Time.deltaTime;
             yield return null;
@@ -255,6 +259,7 @@ public class EnemyAI : MonoBehaviour
         {
             int attackType = Random.Range(0, 3);
 
+            //ieie: Shortened and removed other transforms apart from animations
             if (attackType == 0) animEnemy.SetTrigger("Hit2");
             else if (attackType == 1) animEnemy.SetTrigger("Uppercut");
             else animEnemy.SetTrigger("Low Kick");
