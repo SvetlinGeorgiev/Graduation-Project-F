@@ -69,9 +69,7 @@ public class EnemyAI : MonoBehaviour
 
         if (agent.isOnOffMeshLink)
         {
-            
             return;
-
         }
 
         if (CanSeePlayer())
@@ -95,6 +93,8 @@ public class EnemyAI : MonoBehaviour
             {
                 ChasePlayer();
             }
+
+            FaceDirection(player.transform.position - transform.position);
         }
         else if (isChasing)
         {
@@ -110,6 +110,7 @@ public class EnemyAI : MonoBehaviour
             if (searchTimer > 0)
             {
                 MoveToLastSeenDirection();
+                FaceDirection(lastSeenPlayerPosition - transform.position);
             }
             else
             {
@@ -122,6 +123,13 @@ public class EnemyAI : MonoBehaviour
         {
             Patrol();
         }
+
+        // Face patrol direction if roaming
+        if (!isChasing && !isSearching && !isIdle && agent.velocity.sqrMagnitude > 0.01f)
+        {
+            FaceDirection(agent.velocity);
+        }
+
         Vector3 fixedPosition = transform.position;
         fixedPosition.z = -16.4f;
         transform.position = fixedPosition;
@@ -136,51 +144,33 @@ public class EnemyAI : MonoBehaviour
 
     private void Patrol()
     {
-        
         if ((linkMover != null && linkMover.IsTraversing) || agent.isOnOffMeshLink)
         {
-            
             return;
         }
-         
 
         if (!hasPatrolDestination && !agent.pathPending && !agent.hasPath)
         {
-            
             float patrolDistance = Random.Range(patrolDistanceMin, patrolDistanceMax);
-
             Vector3 horizontalDir = Random.value > 0.5f ? Vector3.right : Vector3.left;
-
             Vector3 verticalDir = Random.value > 0.8f ? Vector3.down : Vector3.zero;
-
             Vector3 direction = (horizontalDir + verticalDir).normalized;
-
             Vector3 targetPos = transform.position + direction * patrolDistance;
 
-            RaycastHit hitInfo;
-
-            if (Physics.Raycast(targetPos + Vector3.up * 5f, Vector3.down, out hitInfo, 10f, groundLayer))
+            if (Physics.Raycast(targetPos + Vector3.up * 5f, Vector3.down, out RaycastHit hitInfo, 10f, groundLayer))
             {
-                targetPos.y = hitInfo.point.y + 0.1f; 
-
+                targetPos.y = hitInfo.point.y + 0.1f;
             }
 
-            NavMeshHit navHit;
-           
-            if (NavMesh.SamplePosition(targetPos, out navHit, 7f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(targetPos, out NavMeshHit navHit, 7f, NavMesh.AllAreas))
             {
                 patrolDestination = navHit.position;
                 if (agent.SetDestination(patrolDestination))
                 {
                     hasPatrolDestination = true;
                     wasMovingToPatrol = true;
-
                     animEnemy.SetBool("Walking", true);
-                    Debug.Log("Start walking");
-                   
-
                     Debug.DrawLine(transform.position, patrolDestination, Color.green, 2f);
-                    Debug.Log($"Patrolling to {patrolDestination}");
                 }
             }
         }
@@ -189,20 +179,15 @@ public class EnemyAI : MonoBehaviour
         {
             if (agent.remainingDistance <= agent.stoppingDistance + 0.1f)
             {
-            animEnemy.SetBool("Walking", false);
-            Debug.Log("Stop walking");
+                animEnemy.SetBool("Walking", false);
                 if (agent.velocity.sqrMagnitude < 0.01f)
                 {
                     hasPatrolDestination = false;
                     wasMovingToPatrol = false;
-                
-
                 }
             }
         }
     }
-
-   
 
     private void ChasePlayer()
     {
@@ -250,18 +235,12 @@ public class EnemyAI : MonoBehaviour
 
     private IEnumerator IdleAnimation()
     {
-        //float tiltAmount = 10f;
-        //float tiltSpeed = 2f;
         float timeElapsed = 0f;
-
         while (timeElapsed < patrolTime)
         {
             animEnemy.SetBool("Idle", true);
-           // float angle = Mathf.Sin(Time.time * tiltSpeed) * tiltAmount;
-           // transform.rotation = Quaternion.Euler(0, 0, angle);
             timeElapsed += Time.deltaTime;
             yield return null;
-
         }
 
         transform.rotation = Quaternion.identity;
@@ -276,32 +255,14 @@ public class EnemyAI : MonoBehaviour
         {
             int attackType = Random.Range(0, 3);
 
-            if (attackType == 0)
-            {
-                animEnemy.SetTrigger("Hit2");
-                //StartCoroutine(PerformAttackTilt(comboStep));
-            }
-            else if (attackType == 1)
-            {
-                animEnemy.SetTrigger("Uppercut");
-                //transform.rotation = Quaternion.Euler(0, 0, -10);
-            }
-            else
-            {
-                animEnemy.SetTrigger("Low Kick");
-                //transform.rotation = Quaternion.Euler(50, 0, -50);
-            }
-            //comboStep = Random.Range(1, 5);
-
-            
+            if (attackType == 0) animEnemy.SetTrigger("Hit2");
+            else if (attackType == 1) animEnemy.SetTrigger("Uppercut");
+            else animEnemy.SetTrigger("Low Kick");
 
             if (Vector3.Distance(transform.position, player.transform.position) < 2f)
             {
                 PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(attackDamage);
-                }
+                if (playerHealth != null) playerHealth.TakeDamage(attackDamage);
 
                 Vector3 knockbackDirection = (player.transform.position - transform.position).normalized;
                 Rigidbody playerRb = player.GetComponent<Rigidbody>();
@@ -311,6 +272,8 @@ public class EnemyAI : MonoBehaviour
                 }
             }
 
+            FaceDirection(player.transform.position - transform.position);
+
             yield return new WaitForSeconds(0.3f);
             transform.rotation = Quaternion.identity;
             yield return new WaitForSeconds(0.2f);
@@ -318,35 +281,27 @@ public class EnemyAI : MonoBehaviour
 
         float randomCooldown = Random.Range(attackCooldownMin, attackCooldownMax);
         yield return new WaitForSeconds(randomCooldown);
-
         isAttacking = false;
     }
 
-    private IEnumerator PerformAttackTilt(int hit)
-    {
-        isAttacking = true;
-
-
-        //switch (hit)
-        //{
-        //    case 1: animEnemy.SetTrigger("Hit"); break;
-        //    case 2: animEnemy.SetTrigger("Hit2"); break;
-        //    case 3: animEnemy.SetTrigger("Uppercut"); break;
-        //    case 4: animEnemy.SetTrigger("Low Kick"); break;
-        //    case 5: animEnemy.SetTrigger("High Kick"); break;
-
-        //}
-
-        yield return new WaitForSeconds(1f);
-
-        isAttacking = false;
-    }
     private void DashTowardsPlayer()
     {
         if (player == null) return;
 
         Vector3 direction = (player.transform.position - transform.position).normalized;
         rb.AddForce(new Vector3(Mathf.Sign(direction.x) * dashForce, 0, 0), ForceMode.Impulse);
-        
+    }
+
+    private void FaceDirection(Vector3 direction)
+    {
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Vector3 flatDir = new Vector3(direction.x, 0f, 0f);
+            if (flatDir != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(flatDir, Vector3.up);
+                transform.rotation = targetRotation;
+            }
+        }
     }
 }

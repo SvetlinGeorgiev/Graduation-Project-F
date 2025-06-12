@@ -74,9 +74,9 @@ public class EnemyAIRanged : MonoBehaviour
             isSearching = false;
             searchTimer = 0f;
             lastSeenPlayerPosition = player.transform.position;
+            FaceTarget(player.transform.position); // Always face the player when seen
 
             float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-            FaceTarget(player.transform.position);
 
             if (distanceToPlayer <= attackRange)
             {
@@ -356,17 +356,14 @@ public class EnemyAIRanged : MonoBehaviour
             if (attackType == 0)
             {
                 anim.SetTrigger("Hit2");
-                //StartCoroutine(PerformAttackTilt(comboStep));
             }
             else if (attackType == 1)
             {
                 anim.SetTrigger("Uppercut");
-                //transform.rotation = Quaternion.Euler(0, 0, -10);
             }
             else
             {
                 anim.SetTrigger("Low Kick");
-                //transform.rotation = Quaternion.Euler(50, 0, -50);
             }
 
             if (Vector3.Distance(transform.position, player.transform.position) < 2f)

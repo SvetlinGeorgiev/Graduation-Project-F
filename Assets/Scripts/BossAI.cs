@@ -91,7 +91,6 @@ public class BossAI : MonoBehaviour
 
         if (agent.isOnOffMeshLink)
         {
-
             return;
         }
 
@@ -104,58 +103,64 @@ public class BossAI : MonoBehaviour
         {
             HandleRetreat();
             anim.SetBool("Walking", true);
-            return;
         }
-
-        if (CanSeePlayer())
+        else
         {
-            if (!bossActivated)
+            if (CanSeePlayer())
             {
-                anim.SetBool("Walking", true);
-                bossActivated = true;
-                BossHealthBar.Instance.Show();
-            }
-
-            isChasing = true;
-            isSearching = false;
-            searchTimer = 0f;
-            lastSeenPlayerPosition = player.transform.position;
-
-            float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-
-            if (distanceToPlayer <= attackRange)
-            {
-                if (!isAttacking && Time.time >= nextComboTime)
+                if (!bossActivated)
                 {
-                    StartCoroutine(PerformAttack());
+                    anim.SetBool("Walking", true);
+                    bossActivated = true;
+                    BossHealthBar.Instance.Show();
                 }
-                agent.ResetPath();
-            }
-            else
-            {
-                ChasePlayer();
-            }
-        }
-        else if (isChasing)
-        {
-            isChasing = false;
-            isSearching = true;
-            searchTimer = chaseLostDuration;
-        }
 
-        if (isSearching)
-        {
-            searchTimer -= Time.fixedDeltaTime;
-
-            if (searchTimer > 0)
-            {
-                MoveToLastSeenDirection();
-            }
-            else
-            {
+                isChasing = true;
                 isSearching = false;
-                agent.ResetPath();
+                searchTimer = 0f;
+                lastSeenPlayerPosition = player.transform.position;
+
+                float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+                if (distanceToPlayer <= attackRange)
+                {
+                    if (!isAttacking && Time.time >= nextComboTime)
+                    {
+                        StartCoroutine(PerformAttack());
+                    }
+                    agent.ResetPath();
+                }
+                else
+                {
+                    ChasePlayer();
+                }
             }
+            else if (isChasing)
+            {
+                isChasing = false;
+                isSearching = true;
+                searchTimer = chaseLostDuration;
+            }
+
+            if (isSearching)
+            {
+                searchTimer -= Time.fixedDeltaTime;
+
+                if (searchTimer > 0)
+                {
+                    MoveToLastSeenDirection();
+                }
+                else
+                {
+                    isSearching = false;
+                    agent.ResetPath();
+                }
+            }
+        }
+
+        if (!(isRetreating && retreatState == RetreatState.BackingOut))
+        {
+            FacePlayer(); // 🔥 Boss faces player unless backing out
         }
 
         Vector3 fixedPos = transform.position;
@@ -174,9 +179,9 @@ public class BossAI : MonoBehaviour
             int rand = Random.Range(1, 5);
 
             if (rand == 1 && (isChasing || isRetreating) && CanSeePlayer())
-                {
-                    StartCoroutine(FireballSequence());
-                }
+            {
+                StartCoroutine(FireballSequence());
+            }
         }
     }
 
@@ -197,7 +202,6 @@ public class BossAI : MonoBehaviour
 
         rb.isKinematic = false;
 
-        // Perform dash BEFORE declaring fireball active
         while (dashElapsed < dashDuration)
         {
             rb.linearVelocity = dashDirection * fireballDashSpeed;
@@ -208,7 +212,6 @@ public class BossAI : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.isKinematic = true;
 
-        // Declare fireball active ONLY after dash is completed
         isFireballActive = true;
 
         if (fireballCountdownTextPrefab != null)
@@ -353,18 +356,15 @@ public class BossAI : MonoBehaviour
 
             if (attackType == 0)
             {
-                //transform.rotation = Quaternion.Euler(0, 0, 10);
                 anim.SetTrigger("Hit2");
             }
             else if (attackType == 1)
             {
                 anim.SetTrigger("Uppercut");
-                //transform.rotation = Quaternion.Euler(0, 0, -10);
             }
             else
             {
                 anim.SetTrigger("High Kick");
-                //transform.rotation = Quaternion.Euler(0, 0, 0);
             }
 
             yield return new WaitForSeconds(0.4f);
