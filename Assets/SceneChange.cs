@@ -9,8 +9,8 @@ public class SceneChange : MonoBehaviour
     public void NextScene()
     {
        // SceneManager.LoadScene(scene);
-        SceneManager.LoadScene(sceneToLoad.name);
-
+       // SceneManager.LoadScene(sceneToLoad.name);
+        SceneManager.LoadScene(1);
     }
     public void Exit()
     {
