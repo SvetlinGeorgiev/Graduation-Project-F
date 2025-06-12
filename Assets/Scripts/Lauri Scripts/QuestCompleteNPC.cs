@@ -7,9 +7,9 @@ public class QuestCompletionNPC : MonoBehaviour
 {
     public string playerTag = "Player";
     public NPCInteraction questGiver;
-    public ScreenSpaceDialogue screenSpaceDialogue; // Assign in Inspector
+    public ScreenSpaceDialogue screenSpaceDialogue; 
     [TextArea(2, 5)]
-    public List<string> dialogueLines; // Fill in Inspector
+    public List<string> dialogueLines; 
 
     private bool isPlayerInRange = false;
     private int currentDialogueIndex = 0;

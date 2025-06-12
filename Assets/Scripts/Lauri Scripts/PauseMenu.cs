@@ -24,33 +24,33 @@ public class PauseMenu : MonoBehaviour
     public void PauseGame()
     {
         isPaused = true;
-        pauseMenuPanel.SetActive(true); // Show the pause menu
-        Time.timeScale = 0f; // Freeze the game
+        pauseMenuPanel.SetActive(true); 
+        Time.timeScale = 0f; 
     }
 
     public void ResumeGame()
     {
         isPaused = false;
-        pauseMenuPanel.SetActive(false); // Hide the pause menu
-        Time.timeScale = 1f; // Resume the game
+        pauseMenuPanel.SetActive(false); 
+        Time.timeScale = 1f; 
     }
 
-    // Methods for the buttons
+  
     public void OpenInventory()
     {
         Debug.Log("Inventory button clicked");
-        // Add inventory logic here
+        
     }
 
     public void OpenSkillTree()
     {
         Debug.Log("Skill Tree button clicked");
-        // Add skill tree logic here
+        
     }
 
     public void OpenWingTsunPractice()
     {
         Debug.Log("Wing Tsun Practice button clicked");
-        // Add Wing Tsun practice logic here
+        
     }
 }

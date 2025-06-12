@@ -13,15 +13,15 @@ public class QuestKillEnemies : MonoBehaviour
     public string enemyTag = "Enemy";
 
     [Header("Quest Banner Animation")]
-    public QuestPanelAnimator questPanelAnimator; // Assign in Inspector
+    public QuestPanelAnimator questPanelAnimator; 
 
-    // Call this from your NPC or quest-giver to start the quest
+    
     public void StartQuest()
     {
         questActive = true;
         questCompleted = false;
         currentKills = 0;
-        // Optionally, show the quest banner here
+       
         if (questPanelAnimator != null)
         {
             questPanelAnimator.ResetPanel();
@@ -29,7 +29,7 @@ public class QuestKillEnemies : MonoBehaviour
         }
     }
 
-    // Call this method from your enemy script when an enemy dies
+    
     public void RegisterEnemyKill(GameObject killedEnemy)
     {
         if (!questActive || questCompleted) return;
@@ -46,7 +46,7 @@ public class QuestKillEnemies : MonoBehaviour
             return;
         }
 
-        // Optionally, update the quest banner text
+        
         if (questPanelAnimator != null)
         {
             questPanelAnimator.questText.text = $"Defeat {killTarget} enemies: {currentKills}/{killTarget}";
@@ -59,7 +59,7 @@ public class QuestKillEnemies : MonoBehaviour
             if (questPanelAnimator != null)
             {
                 questPanelAnimator.questText.text = "Quest Completed!";
-                // Start the shrink/fade animation after a short delay
+               
                 questPanelAnimator.StartCoroutine(FadeAndShrinkBanner());
             }
             Debug.Log("Quest completed! Killed " + currentKills + " enemies.");
@@ -68,7 +68,7 @@ public class QuestKillEnemies : MonoBehaviour
 
     private IEnumerator FadeAndShrinkBanner()
     {
-        yield return new WaitForSeconds(2f); // Wait before starting fade/shrink
+        yield return new WaitForSeconds(2f); 
         if (questPanelAnimator != null)
             yield return questPanelAnimator.PlayShrinkAnimation();
     }

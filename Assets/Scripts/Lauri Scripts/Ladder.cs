@@ -6,7 +6,7 @@ public class Ladder : MonoBehaviour
     private GameObject player;
     public float climbSpeed = 9f;
 
-    public Canvas climbPromptCanvas; // Reference to the world space canvas
+    public Canvas climbPromptCanvas; 
 
     private void OnTriggerEnter(Collider other)
     {
@@ -14,7 +14,7 @@ public class Ladder : MonoBehaviour
         {
             player = other.gameObject;
             if (climbPromptCanvas != null)
-                climbPromptCanvas.gameObject.SetActive(true); // Show prompt
+                climbPromptCanvas.gameObject.SetActive(true); 
         }
     }
 
@@ -32,7 +32,7 @@ public class Ladder : MonoBehaviour
             rb.useGravity = true;
 
             if (climbPromptCanvas != null)
-                climbPromptCanvas.gameObject.SetActive(false); // Hide prompt
+                climbPromptCanvas.gameObject.SetActive(false); 
 
             player = null;
         }
@@ -53,7 +53,7 @@ public class Ladder : MonoBehaviour
             movement.canAttack = false;
 
             if (climbPromptCanvas != null)
-                climbPromptCanvas.gameObject.SetActive(false); // Hide prompt when climbing starts
+                climbPromptCanvas.gameObject.SetActive(false); 
         }
 
         if (isClimbing)
