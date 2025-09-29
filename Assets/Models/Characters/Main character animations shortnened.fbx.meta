@@ -1,14 +1,14 @@
 fileFormatVersion: 2
 guid: cdf8375347fcfcd4e941ddc706c73ea4
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
-    materialImportMode: 2
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
-    materialLocation: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -256,7 +256,7 @@ ModelImporter:
       name: Hit 1 jab 1
       takeName: Hit 1 jab 1
       internalID: 2476012754293677970
-      firstFrame: 51
+      firstFrame: 0
       lastFrame: 94
       wrapMode: 0
       orientationOffsetY: 0
@@ -510,6 +510,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
